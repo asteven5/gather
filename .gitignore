@@ -1,0 +1,11 @@
+uploads/
+output/
+library/
+.DS_Store
+__pycache__/
+.venv/
+*.mp4
+*.MOV
+*.mov
+*.jpg
+*.png

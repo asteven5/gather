@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gather | Time-Stitched Memories</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playball&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4db6ac;
+            --primary-hover: #26a69a;
+            --bg: #ffffff;
+            --sidebar-bg: #4db6ac;
+            --text: #333333;
+            --text-dim: #666666;
+            --text-light: #999999;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            overflow: hidden;
+            background-image: linear-gradient(to right, var(--sidebar-bg) 0%, var(--sidebar-bg) 300px, white 300px, white 100%);
+        }
+
+        .sidebar {
+            width: 300px;
+            padding: 4rem 2rem;
+            color: white;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+        }
+
+        .year-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .year-link:hover, .year-link.active {
+            opacity: 1;
+            transform: translateX(5px);
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .modal h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .video-card {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background: #eee;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-card .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.8));
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .video-card .menu-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-card:hover .menu-btn {
+            opacity: 1;
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 4rem;
+            background: white;
+            text-align: left;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Playball', cursive;
+            font-size: 6rem;
+            font-weight: 400;
+            margin-bottom: 0rem;
+            color: #222;
+            line-height: 1;
+        }
+
+        p.subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 2.5rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        p.description {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            letter-spacing: 0.01em;
+        }
+
+        .drop-zone {
+            border: 2px solid #eeeeee;
+            border-radius: 1.5rem;
+            padding: 4rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(77, 182, 172, 0.05);
+        }
+
+        .btn-go {
+            margin-top: 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.25rem 4rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 3rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: none;
+        }
+
+        .file-list {
+            margin: 2rem auto 0;
+            max-height: 200px;
+            overflow-y: auto;
+            max-width: 500px;
+        }
+
+        .btn-go {
+            margin: 2rem auto 0;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.25rem 4rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 3rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: none;
+        }
+
+        .status-container {
+            max-width: 500px;
+            margin: 1.5rem auto 0;
+            text-align: center;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: none;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>My Videos</h2>
+        <div id="yearList"></div>
+    </div>
+
+    <div class="modal-overlay" id="titleModal">
+        <div class="modal">
+            <h3>Title Your Memory</h3>
+            <input type="text" id="videoTitle" placeholder="e.g. December 2023 Home Movie">
+            <button class="btn-go" style="display: block; width: 100%;" id="btnSaveLibrary">SAVE TO LIBRARY</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="thumbModal">
+        <div class="modal">
+            <h3>Choose Thumbnail</h3>
+            <p style="color: #666; margin-bottom: 1.5rem; font-size: 0.9rem;">Enter the time (e.g. 00:00:15) to grab a frame.</p>
+            <input type="text" id="thumbTime" placeholder="00:00:01">
+            <button class="btn-go" style="display: block; width: 100%; margin: 0;" id="btnSaveThumb">UPDATE THUMBNAIL</button>
+            <button class="year-link" style="color:var(--text-dim); margin-top:1rem; font-size:0.9rem; width:100%; text-align:center;" onclick="document.getElementById('thumbModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent">
+        <div id="uploadView">
+            <h1>Gather</h1>
+            <p class="subtitle">Home Video Maker</p>
+            <p class="description">Stitch your video clips into seamless family home videos</p>
+            
+            <div class="drop-zone" id="dropZone">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:48px; color:var(--primary); margin-bottom:1rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <div>Drop videos here or click to browse</div>
+                <input type="file" id="fileInput" multiple accept="video/*" style="display: none;">
+            </div>
+
+            <div class="file-list" id="fileList"></div>
+            <div style="text-align: center;">
+                <button class="btn-go" id="btnGo">STITCH VIDEOS</button>
+            </div>
+            <div class="status-container">
+                <div class="loader" id="loader"></div>
+                <div class="status" id="status">Stitching memories...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onerror = function(msg, url, line) { alert("🐶 Puppy Error: " + msg + "\nAt: " + line); };
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const btnGo = document.getElementById('btnGo');
+        const loader = document.getElementById('loader');
+        const status = document.getElementById('status');
+        const yearList = document.getElementById('yearList');
+        const uploadView = document.getElementById('uploadView');
+        const mainContent = document.getElementById('mainContent');
+        const titleModal = document.getElementById('titleModal');
+        const videoTitleInput = document.getElementById('videoTitle');
+        const btnSaveLibrary = document.getElementById('btnSaveLibrary');
+        const thumbModal = document.getElementById('thumbModal');
+        const thumbTimeInput = document.getElementById('thumbTime');
+        const btnSaveThumb = document.getElementById('btnSaveThumb');
+        
+        let selectedFiles = [];
+        let currentProcessedYear = "";
+        let currentThumbVideo = { year: "", filename: "" };
+
+        async function loadLibrary() {
+            const response = await fetch('/library-data');
+            const data = await response.json();
+            yearList.innerHTML = '<a class="year-link active" onclick="showUpload()">+ New Project</a>';
+            Object.keys(data).forEach(year => {
+                const link = document.createElement('a');
+                link.className = 'year-link';
+                link.innerText = year;
+                link.onclick = () => showYear(year, data[year]);
+                yearList.appendChild(link);
+            });
+        }
+
+        function showUpload() {
+            uploadView.style.display = 'block';
+            let existing = document.getElementById('yearView');
+            if (existing) existing.remove();
+            document.querySelectorAll('.year-link').forEach(l => l.classList.remove('active'));
+            document.querySelector('.year-link').classList.add('active');
+        }
+
+        function showYear(year, videos) {
+            uploadView.style.display = 'none';
+            let existing = document.getElementById('yearView');
+            if (existing) existing.remove();
+
+            const view = document.createElement('div');
+            view.id = 'yearView';
+            
+            let html = '<h1 style="font-size: 3rem; margin-bottom: 2rem;">' + year + ' Memories</h1><div class="video-grid">';
+            if (videos && videos.length > 0) {
+                videos.forEach(v => {
+                    const safePath = '/library/' + encodeURIComponent(year) + '/' + encodeURIComponent(v.filename);
+                    const safeThumb = v.thumb ? '/library/' + encodeURIComponent(year) + '/' + encodeURIComponent(v.thumb) + '?t=' + Date.now() : '';
+                    html += '<div class="video-card">';
+                    html += '<div class="menu-btn" onclick="event.stopPropagation(); openThumbPicker(\'' + year + '\', \'' + v.filename + '\')">⋮</div>';
+                    html += '<div onclick="window.open(\'' + safePath + '\')" style="height:100%">';
+                    if (safeThumb) html += '<img src="' + safeThumb + '" onerror="this.style.display=\'none\'">';
+                    html += '<div class="overlay"><div>' + v.title + '</div></div></div></div>';
+                });
+            } else { html += '<p>No videos found.</p>'; }
+            html += '</div>';
+            view.innerHTML = html;
+            mainContent.appendChild(view);
+            
+            document.querySelectorAll('.year-link').forEach(l => {
+                l.classList.remove('active');
+                if (l.innerText === year) l.classList.add('active');
+            });
+        }
+
+        function openThumbPicker(year, filename) {
+            currentThumbVideo = { year, filename };
+            thumbModal.style.display = 'flex';
+        }
+
+        btnSaveThumb.onclick = async () => {
+            btnSaveThumb.innerText = "EXTRACTING...";
+            await fetch('/update-thumbnail', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    year: currentThumbVideo.year,
+                    filename: currentThumbVideo.filename,
+                    timestamp: thumbTimeInput.value || "00:00:01"
+                })
+            });
+            btnSaveThumb.innerText = "UPDATE THUMBNAIL";
+            thumbModal.style.display = 'none';
+            const yearDataResponse = await fetch('/library-data');
+            const libraryData = await yearDataResponse.json();
+            showYear(currentThumbVideo.year, libraryData[currentThumbVideo.year]);
+        };
+
+        loadLibrary();
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFiles(e.target.files);
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('drag-over');
+        dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); };
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            fileList.innerHTML = '';
+            selectedFiles.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `<span>${file.name}</span> <span style="color:#999">${(file.size/1024/1024).toFixed(1)}MB</span>`;
+                fileList.appendChild(item);
+            });
+            if (selectedFiles.length > 0) btnGo.style.display = 'inline-block';
+        }
+
+        btnGo.onclick = async () => {
+            btnGo.style.display = 'none';
+            loader.style.display = 'inline-block';
+            status.style.display = 'block';
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            const data = await response.json();
+            if (data.status === 'success') {
+                currentProcessedYear = data.year;
+                loader.style.display = 'none';
+                status.style.display = 'none';
+                titleModal.style.display = 'flex';
+            }
+        };
+
+        btnSaveLibrary.onclick = async () => {
+            const title = videoTitleInput.value || "My Movie";
+            btnSaveLibrary.disabled = true;
+            btnSaveLibrary.innerText = "SAVING...";
+            try {
+                await fetch('/save-to-library', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ year: currentProcessedYear, title: title }) });
+                titleModal.style.display = 'none';
+                btnSaveLibrary.disabled = false;
+                btnSaveLibrary.innerText = "SAVE TO LIBRARY";
+                videoTitleInput.value = "";
+                await loadLibrary();
+                const yearDataResponse = await fetch('/library-data');
+                const libraryData = await yearDataResponse.json();
+                showYear(currentProcessedYear, libraryData[currentProcessedYear]);
+            } catch (err) { alert("Error saving: " + err); }
+        };
+    </script>
+</body>
+</html>
