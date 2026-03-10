@@ -1,283 +1,126 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gather | Time-Stitched Memories</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playball&display=swap" rel="stylesheet">
+    <title>Gather | Home Video Maker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Playball&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4db6ac;
-            --primary-hover: #26a69a;
-            --bg: #ffffff;
-            --sidebar-bg: #4db6ac;
-            --text: #333333;
-            --text-dim: #666666;
-            --text-light: #999999;
+            --primary: #8DAA91;
+            --primary-hover: #7A9A7E;
+            --primary-glow: rgba(141, 170, 145, 0.18);
+            --bg: #FDF9F5;
+            --surface: #FFFFFF;
+            --surface-hover: #F7F2EC;
+            --sidebar-bg: #F5EFE8;
+            --border: #E8DDD2;
+            --text: #3D3532;
+            --text-dim: #8C7E75;
+            --text-muted: #B5A99E;
+            --danger: #D4726A;
+            --accent: #D4A574;
+            --shadow-soft: rgba(62, 53, 50, 0.06);
+            --shadow-medium: rgba(62, 53, 50, 0.1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: stretch; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: stretch;
-            justify-content: center;
-            overflow: hidden;
-            background-image: linear-gradient(to right, var(--sidebar-bg) 0%, var(--sidebar-bg) 300px, white 300px, white 100%);
-        }
+        /* Sidebar */
+        .sidebar { width: 280px; padding: 3.5rem 2.5rem; background: var(--sidebar-bg); border-right: 1px solid var(--border); flex-shrink: 0; overflow-y: auto; z-index: 100; }
+        .sidebar h2 { font-size: 1.1rem; margin-bottom: 2.5rem; text-transform: uppercase; letter-spacing: 0.35em; font-weight: 700; color: var(--text-muted); }
+        .year-link { display: block; color: var(--text); text-decoration: none; font-size: 1.05rem; margin-bottom: 0.4rem; padding: 0.75rem 1.2rem; border-radius: 1rem; opacity: 0.55; transition: all 0.25s ease; cursor: pointer; font-weight: 600; }
+        .year-link:hover { opacity: 0.85; background: var(--surface); box-shadow: 0 2px 8px var(--shadow-soft); }
+        .year-link.active { opacity: 1; background: var(--primary-glow); color: var(--primary-hover); font-weight: 700; }
 
-        .sidebar {
-            width: 300px;
-            padding: 4rem 2rem;
-            color: white;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
+        /* Main Container */
+        .container { flex-grow: 1; padding: 5rem 6rem; background: var(--bg); text-align: center; overflow-y: auto; max-height: 100vh; position: relative; }
+        h1 { font-family: 'Playball', cursive; font-size: 6.5rem; font-weight: 400; margin-bottom: 0.2rem; color: var(--primary-hover); line-height: 0.9; }
+        p.subtitle { font-family: 'Nunito', sans-serif; font-weight: 300; font-size: 2.6rem; color: var(--text-dim); margin-bottom: 0.8rem; }
+        p.description { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4rem; text-transform: uppercase; letter-spacing: 0.18em; }
 
-        .sidebar h2 {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0.9;
-        }
+        /* Drop Zone */
+        .drop-zone { border: 2px dashed var(--border); border-radius: 2rem; padding: 5rem 2rem; cursor: pointer; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface); text-align: center; max-width: 550px; margin: 0 auto 2rem; box-shadow: 0 4px 20px var(--shadow-soft); }
+        .drop-zone:hover { border-color: var(--primary); background: var(--surface-hover); box-shadow: 0 8px 30px var(--shadow-medium); }
+        .drop-zone.drag-over { border-color: var(--primary); background: rgba(141, 170, 145, 0.06); transform: scale(1.02); box-shadow: 0 8px 40px var(--shadow-medium); }
 
-        .year-link {
-            display: block;
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            opacity: 0.7;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
+        /* Buttons */
+        .btn-go { background: var(--primary); color: #fff; border: none; padding: 1.2rem 4rem; font-size: 0.85rem; font-weight: 700; border-radius: 4rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.2em; transition: all 0.3s ease; display: none; margin: 2rem auto; box-shadow: 0 4px 15px rgba(141, 170, 145, 0.3); }
+        .btn-go:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(141, 170, 145, 0.4); }
+        .btn-go:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .year-link:hover, .year-link.active {
-            opacity: 1;
-            transform: translateX(5px);
-            font-weight: 600;
-        }
+        /* Video Grid */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .video-card { position: relative; border-radius: 1.5rem; overflow: hidden; aspect-ratio: 1; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface); border: 1px solid var(--border); box-shadow: 0 4px 16px var(--shadow-soft); }
+        .video-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px var(--shadow-medium); border-color: var(--primary); }
+        .video-card img { width: 100%; height: 100%; object-fit: cover; }
+        .video-card .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 45%, rgba(62, 53, 50, 0.85)); display: flex; align-items: flex-end; padding: 2rem; color: white; font-weight: 700; font-size: 1.25rem; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
+        /* Card Menu */
+        .menu-btn { position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px; background: rgba(255,255,255,0.85); color: var(--text); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0; transition: 0.3s; font-size: 1.2rem; backdrop-filter: blur(10px); cursor: pointer; box-shadow: 0 2px 8px var(--shadow-soft); }
+        .video-card:hover .menu-btn { opacity: 1; }
+        .dropdown { position: absolute; top: 3.2rem; right: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; box-shadow: 0 12px 35px var(--shadow-medium); display: none; flex-direction: column; overflow: hidden; z-index: 100; width: 180px; }
+        .dropdown button { padding: 0.9rem 1.3rem; border: none; background: none; text-align: left; font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-weight: 600; color: var(--text); font-family: 'Nunito', sans-serif; }
+        .dropdown button:hover { background: var(--surface-hover); color: var(--primary-hover); }
+        .dropdown button.delete { color: var(--danger); }
+        .dropdown button.delete:hover { background: rgba(212, 114, 106, 0.08); }
 
-        .modal {
-            background: white;
-            padding: 3rem;
-            border-radius: 2rem;
-            width: 400px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
+        /* YouTube Modal */
+        .yt-field { display: flex; flex-direction: column; text-align: left; margin-bottom: 1.2rem; }
+        .yt-field label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.4rem; }
+        .yt-field input, .yt-field textarea, .yt-field select { width: 100%; padding: 0.9rem 1.1rem; border: 2px solid var(--border); border-radius: 0.8rem; font-size: 0.95rem; outline: none; transition: 0.3s; background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; }
+        .yt-field input:focus, .yt-field textarea:focus, .yt-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+        .yt-field textarea { resize: vertical; min-height: 70px; }
+        .yt-field select { cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238C7E75' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+        .yt-success { color: var(--primary-hover); font-weight: 700; text-align: center; }
+        .yt-success a { color: var(--primary); text-decoration: underline; }
 
-        .modal h3 {
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(61, 53, 50, 0.4); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s; }
+        .modal { background: var(--surface); border: 1px solid var(--border); padding: 3.5rem; border-radius: 2.5rem; width: 480px; text-align: center; box-shadow: 0 25px 60px var(--shadow-medium); }
+        .modal h3 { font-size: 1.6rem; margin-bottom: 1.8rem; font-weight: 700; color: var(--text); font-family: 'Playball', cursive; font-size: 2rem; }
+        .modal input { width: 100%; padding: 1.1rem 1.4rem; border: 2px solid var(--border); border-radius: 1rem; margin-bottom: 1.8rem; font-size: 1rem; outline: none; transition: 0.3s; background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; }
+        .modal input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+        .modal input::placeholder { color: var(--text-muted); }
+        .btn-cancel { margin-top: 1.5rem; border: none; background: none; cursor: pointer; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.75rem; transition: 0.2s; }
+        .btn-cancel:hover { color: var(--text-dim); }
 
-        .modal input {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-        }
+        /* Thumbnail Picker */
+        .thumb-option { border-radius: 1.2rem; overflow: hidden; cursor: pointer; border: 3px solid var(--border); transition: 0.3s; aspect-ratio: 1; }
+        .thumb-option:hover { border-color: var(--primary); transform: scale(1.04); box-shadow: 0 8px 20px var(--shadow-medium); }
+        .thumb-option img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .thumb-option.selected { border-color: var(--primary); opacity: 0.5; pointer-events: none; }
+        .btn-refresh { border: 2px solid var(--border); background: none; color: var(--text-dim); padding: 0.7rem 1.8rem; border-radius: 3rem; cursor: pointer; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.25s; margin-bottom: 0.5rem; font-family: 'Nunito', sans-serif; }
+        .btn-refresh:hover { border-color: var(--primary); color: var(--primary-hover); background: var(--primary-glow); }
+        .btn-refresh:disabled { opacity: 0.3; pointer-events: none; }
 
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
+        /* Status & Feedback */
+        .loader { width: 46px; height: 46px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 2rem auto; display: none; }
+        .error-msg { color: var(--danger); font-weight: 700; text-align: center; margin-top: 1rem; display: none; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.82rem; }
 
-        .video-card {
-            position: relative;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            aspect-ratio: 1;
-            cursor: pointer;
-            transition: transform 0.3s;
-            background: #eee;
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        .video-card:hover {
-            transform: translateY(-5px);
-        }
+        /* Video Player Modal */
+        .player-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 18, 17, 0.92); backdrop-filter: blur(16px); display: none; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.25s; cursor: pointer; }
+        .player-modal video { max-width: 92vw; max-height: 88vh; border-radius: 1.2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); cursor: default; }
+        .player-close { position: fixed; top: 1.5rem; right: 2rem; background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.8); font-size: 1.6rem; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 2001; }
+        .player-close:hover { background: rgba(255,255,255,0.25); color: #fff; }
+        .player-fullscreen { position: fixed; top: 1.5rem; right: 5rem; background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.8); font-size: 1.2rem; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 2001; }
+        .player-fullscreen:hover { background: rgba(255,255,255,0.25); color: #fff; }
+        .player-modal.is-fullscreen { background: #000; backdrop-filter: none; }
+        .player-modal.is-fullscreen video { max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; object-fit: contain; border-radius: 0; box-shadow: none; }
+        .player-modal.is-fullscreen .player-close,
+        .player-modal.is-fullscreen .player-fullscreen { opacity: 0; transition: opacity 0.3s; }
+        .player-modal.is-fullscreen:hover .player-close,
+        .player-modal.is-fullscreen:hover .player-fullscreen { opacity: 1; }
 
-        .video-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .video-card .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.8));
-            display: flex;
-            align-items: flex-end;
-            padding: 2rem;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .video-card .menu-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 32px;
-            height: 32px;
-            background: rgba(0,0,0,0.4);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .video-card:hover .menu-btn {
-            opacity: 1;
-        }
-
-        .container {
-            flex-grow: 1;
-            padding: 4rem;
-            background: white;
-            text-align: left;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-
-        h1 {
-            font-family: 'Playball', cursive;
-            font-size: 6rem;
-            font-weight: 400;
-            margin-bottom: 0rem;
-            color: #222;
-            line-height: 1;
-        }
-
-        p.subtitle {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            font-size: 2.5rem;
-            color: var(--text-dim);
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.02em;
-        }
-
-        p.description {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-bottom: 3rem;
-            letter-spacing: 0.01em;
-        }
-
-        .drop-zone {
-            border: 2px solid #eeeeee;
-            border-radius: 1.5rem;
-            padding: 4rem 2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #fafafa;
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .drop-zone:hover, .drop-zone.drag-over {
-            border-color: var(--primary);
-            background: rgba(77, 182, 172, 0.05);
-        }
-
-        .btn-go {
-            margin-top: 2rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1.25rem 4rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 3rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            display: none;
-        }
-
-        .file-list {
-            margin: 2rem auto 0;
-            max-height: 200px;
-            overflow-y: auto;
-            max-width: 500px;
-        }
-
-        .btn-go {
-            margin: 2rem auto 0;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1.25rem 4rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 3rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            display: none;
-        }
-
-        .status-container {
-            max-width: 500px;
-            margin: 1.5rem auto 0;
-            text-align: center;
-        }
-
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: var(--primary);
-            border-radius: 50%;
-            display: none;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -286,198 +129,547 @@
         <div id="yearList"></div>
     </div>
 
-    <div class="modal-overlay" id="titleModal">
-        <div class="modal">
-            <h3>Title Your Memory</h3>
-            <input type="text" id="videoTitle" placeholder="e.g. December 2023 Home Movie">
-            <button class="btn-go" style="display: block; width: 100%;" id="btnSaveLibrary">SAVE TO LIBRARY</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="thumbModal">
-        <div class="modal">
-            <h3>Choose Thumbnail</h3>
-            <p style="color: #666; margin-bottom: 1.5rem; font-size: 0.9rem;">Enter the time (e.g. 00:00:15) to grab a frame.</p>
-            <input type="text" id="thumbTime" placeholder="00:00:01">
-            <button class="btn-go" style="display: block; width: 100%; margin: 0;" id="btnSaveThumb">UPDATE THUMBNAIL</button>
-            <button class="year-link" style="color:var(--text-dim); margin-top:1rem; font-size:0.9rem; width:100%; text-align:center;" onclick="document.getElementById('thumbModal').style.display='none'">Cancel</button>
-        </div>
-    </div>
-
     <div class="container" id="mainContent">
         <div id="uploadView">
             <h1>Gather</h1>
             <p class="subtitle">Home Video Maker</p>
             <p class="description">Stitch your video clips into seamless family home videos</p>
-            
+
             <div class="drop-zone" id="dropZone">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:48px; color:var(--primary); margin-bottom:1rem;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <div>Drop videos here or click to browse</div>
+                <svg width="56" height="56" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--primary); margin-bottom:1.5rem; opacity:0.6;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                <div style="font-size:1.05rem; color:var(--text-dim); font-weight:600;">Click or drag clips here to gather them</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem;">MP4, MOV, and more — make it a movie night ✨</div>
                 <input type="file" id="fileInput" multiple accept="video/*" style="display: none;">
             </div>
+            <div id="fileList" style="max-width: 550px; margin: 0 auto; text-align: left"></div>
+            <button class="btn-go" id="btnGo">Start Stitching</button>
+            <div class="loader" id="loader"></div>
+            <div id="status" style="color:var(--primary-hover); font-weight:700; text-align:center; margin-top:1rem; display:none; text-transform:uppercase; letter-spacing:0.15em; font-size:0.82rem;">Crafting your movie... ✨</div>
+            <div class="error-msg" id="errorMsg"></div>
+        </div>
+    </div>
 
-            <div class="file-list" id="fileList"></div>
-            <div style="text-align: center;">
-                <button class="btn-go" id="btnGo">STITCH VIDEOS</button>
+    <!-- Title Modal -->
+    <div class="modal-overlay" id="titleModal">
+        <div class="modal">
+            <h3>Title your memory</h3>
+            <input type="text" id="vTitle" placeholder="e.g. Christmas 2025">
+            <button class="btn-go" style="display:block; width:100%; margin:0" id="btnSave">SAVE TO LIBRARY</button>
+            <button class="btn-cancel" onclick="closeModal('titleModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Thumbnail Modal -->
+    <div class="modal-overlay" id="thumbModal">
+        <div class="modal" style="width:600px">
+            <h3>Choose Thumbnail</h3>
+            <p style="color:var(--text-dim); margin-bottom:1.5rem; font-weight:400">Pick the perfect frame for your memory</p>
+            <div class="loader" id="thumbLoader"></div>
+            <div id="thumbOptions" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem"></div>
+            <button class="btn-refresh" id="btnRefreshThumbs" onclick="refreshThumbs()">↻ Show different options</button><br>
+            <button class="btn-cancel" onclick="closeModal('thumbModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div class="player-modal" id="playerModal" onclick="closePlayer(event)">
+        <button class="player-fullscreen" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+        <button class="player-close" onclick="closePlayer()" title="Close">✕</button>
+        <video id="videoPlayer" controls playsinline></video>
+    </div>
+
+    <!-- YouTube Upload Modal -->
+    <div class="modal-overlay" id="ytModal">
+        <div class="modal" style="width:480px">
+            <h3>Upload to YouTube</h3>
+            <div id="ytForm">
+                <div class="yt-field">
+                    <label>Title</label>
+                    <input type="text" id="ytTitle" placeholder="My Home Video">
+                </div>
+                <div class="yt-field">
+                    <label>Description</label>
+                    <textarea id="ytDesc" placeholder="A short description (optional)"></textarea>
+                </div>
+                <div class="yt-field">
+                    <label>Privacy</label>
+                    <select id="ytPrivacy">
+                        <option value="private">Private</option>
+                        <option value="unlisted">Unlisted</option>
+                        <option value="public">Public</option>
+                    </select>
+                </div>
+                <button class="btn-go" style="display:block; width:100%; margin:0" id="btnYtUpload">UPLOAD</button>
             </div>
-            <div class="status-container">
-                <div class="loader" id="loader"></div>
-                <div class="status" id="status">Stitching memories...</div>
-            </div>
+            <div id="ytStatus" style="display:none; margin-top:1rem"></div>
+            <div class="loader" id="ytLoader"></div>
+            <div class="error-msg" id="ytError"></div>
+            <button class="btn-cancel" id="ytCancel" onclick="closeModal('ytModal')">Cancel</button>
         </div>
     </div>
 
     <script>
-        window.onerror = function(msg, url, line) { alert("🐶 Puppy Error: " + msg + "\nAt: " + line); };
+    const $ = id => document.getElementById(id);
+    let currentYear = '', currentVid = {};
 
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-        const btnGo = document.getElementById('btnGo');
-        const loader = document.getElementById('loader');
-        const status = document.getElementById('status');
-        const yearList = document.getElementById('yearList');
-        const uploadView = document.getElementById('uploadView');
-        const mainContent = document.getElementById('mainContent');
-        const titleModal = document.getElementById('titleModal');
-        const videoTitleInput = document.getElementById('videoTitle');
-        const btnSaveLibrary = document.getElementById('btnSaveLibrary');
-        const thumbModal = document.getElementById('thumbModal');
-        const thumbTimeInput = document.getElementById('thumbTime');
-        const btnSaveThumb = document.getElementById('btnSaveThumb');
-        
-        let selectedFiles = [];
-        let currentProcessedYear = "";
-        let currentThumbVideo = { year: "", filename: "" };
+    /* ------------------------------------------------------------------
+     * Helpers
+     * ----------------------------------------------------------------*/
+    function closeModal(id) { $(id).style.display = 'none'; }
 
-        async function loadLibrary() {
-            const response = await fetch('/library-data');
-            const data = await response.json();
-            yearList.innerHTML = '<a class="year-link active" onclick="showUpload()">+ New Project</a>';
-            Object.keys(data).forEach(year => {
-                const link = document.createElement('a');
-                link.className = 'year-link';
-                link.innerText = year;
-                link.onclick = () => showYear(year, data[year]);
-                yearList.appendChild(link);
+    function openPlayer(src) {
+        const vid = $('videoPlayer');
+        vid.src = src;
+        $('playerModal').style.display = 'flex';
+        vid.play();
+    }
+
+    function closePlayer(e) {
+        if (e && e.target !== $('playerModal')) return;
+        const vid = $('videoPlayer');
+        vid.pause();
+        vid.removeAttribute('src');
+        vid.load();
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        $('playerModal').classList.remove('is-fullscreen');
+        $('playerModal').style.display = 'none';
+    }
+
+    function toggleFullscreen() {
+        if (window.pywebview && window.pywebview.api) {
+            window.pywebview.api.toggle_fullscreen();
+            $('playerModal').classList.toggle('is-fullscreen');
+        }
+    }
+
+    function showError(msg) {
+        const el = $('errorMsg');
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 6000);
+    }
+
+    function resetUploadUI() {
+        $('loader').style.display = 'none';
+        $('status').style.display = 'none';
+        $('btnGo').style.display = 'none';
+        $('fileList').innerHTML = '';
+    }
+
+    /** Safely escape a string for use in HTML attributes. */
+    function escAttr(str) {
+        const el = document.createElement('span');
+        el.textContent = str;
+        return el.innerHTML.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    }
+
+    /* ------------------------------------------------------------------
+     * Drag-and-drop
+     * ----------------------------------------------------------------*/
+    const dropZone = $('dropZone');
+    dropZone.addEventListener('click', () => $('fileInput').click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const dt = e.dataTransfer;
+        if (dt.files.length) {
+            $('fileInput').files = dt.files;
+            $('fileInput').dispatchEvent(new Event('change'));
+        }
+    });
+
+    /* ------------------------------------------------------------------
+     * Keyboard: Escape closes modals
+     * ----------------------------------------------------------------*/
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeModal('titleModal');
+            closeModal('thumbModal');
+            closeModal('ytModal');
+            if ($('playerModal').style.display === 'flex') closePlayer();
+        }
+    });
+
+    /* Click outside modal content to close */
+    ['titleModal', 'thumbModal', 'ytModal'].forEach(id => {
+        $(id).addEventListener('click', e => {
+            if (e.target === $(id)) closeModal(id);
+        });
+    });
+
+    /* ------------------------------------------------------------------
+     * Library sidebar
+     * ----------------------------------------------------------------*/
+    async function loadLib() {
+        try {
+            const res = await fetch('/library-data');
+            if (!res.ok) throw new Error('Failed to load library');
+            const data = await res.json();
+            $('yearList').innerHTML = '<a class="year-link active" onclick="showUpload()">+ New Project</a>';
+            Object.keys(data).sort().reverse().forEach(y => {
+                const a = document.createElement('a');
+                a.className = 'year-link';
+                a.textContent = y;
+                a.onclick = () => showYear(y, data[y]);
+                $('yearList').appendChild(a);
             });
+        } catch (err) {
+            console.error('loadLib failed:', err);
         }
+    }
 
-        function showUpload() {
-            uploadView.style.display = 'block';
-            let existing = document.getElementById('yearView');
-            if (existing) existing.remove();
-            document.querySelectorAll('.year-link').forEach(l => l.classList.remove('active'));
-            document.querySelector('.year-link').classList.add('active');
-        }
+    function showUpload() {
+        $('uploadView').style.display = 'block';
+        if ($('yView')) $('yView').remove();
+        document.querySelectorAll('.year-link').forEach(l =>
+            l.classList.toggle('active', l.textContent.includes('New'))
+        );
+    }
 
-        function showYear(year, videos) {
-            uploadView.style.display = 'none';
-            let existing = document.getElementById('yearView');
-            if (existing) existing.remove();
+    /* ------------------------------------------------------------------
+     * Year view (video grid)
+     * ----------------------------------------------------------------*/
+    function showYear(y, videos) {
+        $('uploadView').style.display = 'none';
+        if ($('yView')) $('yView').remove();
 
-            const view = document.createElement('div');
-            view.id = 'yearView';
-            
-            let html = '<h1 style="font-size: 3rem; margin-bottom: 2rem;">' + year + ' Memories</h1><div class="video-grid">';
-            if (videos && videos.length > 0) {
-                videos.forEach(v => {
-                    const safePath = '/library/' + encodeURIComponent(year) + '/' + encodeURIComponent(v.filename);
-                    const safeThumb = v.thumb ? '/library/' + encodeURIComponent(year) + '/' + encodeURIComponent(v.thumb) + '?t=' + Date.now() : '';
-                    html += '<div class="video-card">';
-                    html += '<div class="menu-btn" onclick="event.stopPropagation(); openThumbPicker(\'' + year + '\', \'' + v.filename + '\')">⋮</div>';
-                    html += '<div onclick="window.open(\'' + safePath + '\')" style="height:100%">';
-                    if (safeThumb) html += '<img src="' + safeThumb + '" onerror="this.style.display=\'none\'">';
-                    html += '<div class="overlay"><div>' + v.title + '</div></div></div></div>';
-                });
-            } else { html += '<p>No videos found.</p>'; }
-            html += '</div>';
-            view.innerHTML = html;
-            mainContent.appendChild(view);
-            
-            document.querySelectorAll('.year-link').forEach(l => {
-                l.classList.remove('active');
-                if (l.innerText === year) l.classList.add('active');
-            });
-        }
+        const view = document.createElement('div');
+        view.id = 'yView';
 
-        function openThumbPicker(year, filename) {
-            currentThumbVideo = { year, filename };
-            thumbModal.style.display = 'flex';
-        }
+        const heading = document.createElement('h1');
+        heading.style.cssText = 'font-size:3rem; margin-bottom:2.5rem; font-weight:400; text-align:center; color:var(--primary-hover)';
+        heading.textContent = `${y} Memories`;
+        view.appendChild(heading);
 
-        btnSaveThumb.onclick = async () => {
-            btnSaveThumb.innerText = "EXTRACTING...";
-            await fetch('/update-thumbnail', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    year: currentThumbVideo.year,
-                    filename: currentThumbVideo.filename,
-                    timestamp: thumbTimeInput.value || "00:00:01"
-                })
-            });
-            btnSaveThumb.innerText = "UPDATE THUMBNAIL";
-            thumbModal.style.display = 'none';
-            const yearDataResponse = await fetch('/library-data');
-            const libraryData = await yearDataResponse.json();
-            showYear(currentThumbVideo.year, libraryData[currentThumbVideo.year]);
-        };
+        const grid = document.createElement('div');
+        grid.className = 'video-grid';
 
-        loadLibrary();
+        videos.forEach(v => {
+            const safeYear = encodeURIComponent(y);
+            const safeFile = encodeURIComponent(v.filename);
+            const path = `/library/${safeYear}/${safeFile}`;
 
-        dropZone.onclick = () => fileInput.click();
-        fileInput.onchange = (e) => handleFiles(e.target.files);
-        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); };
-        dropZone.ondragleave = () => dropZone.classList.remove('drag-over');
-        dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); };
+            const card = document.createElement('div');
+            card.className = 'video-card';
 
-        function handleFiles(files) {
-            selectedFiles = Array.from(files);
-            fileList.innerHTML = '';
-            selectedFiles.forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'file-item';
-                item.innerHTML = `<span>${file.name}</span> <span style="color:#999">${(file.size/1024/1024).toFixed(1)}MB</span>`;
-                fileList.appendChild(item);
-            });
-            if (selectedFiles.length > 0) btnGo.style.display = 'inline-block';
-        }
+            // Menu button
+            const menuBtn = document.createElement('button');
+            menuBtn.className = 'menu-btn';
+            menuBtn.textContent = '⋮';
+            menuBtn.onclick = e => { e.stopPropagation(); toggleMenu(e); };
 
-        btnGo.onclick = async () => {
-            btnGo.style.display = 'none';
-            loader.style.display = 'inline-block';
-            status.style.display = 'block';
-            const formData = new FormData();
-            selectedFiles.forEach(file => formData.append('files', file));
-            const response = await fetch('/upload', { method: 'POST', body: formData });
-            const data = await response.json();
-            if (data.status === 'success') {
-                currentProcessedYear = data.year;
-                loader.style.display = 'none';
-                status.style.display = 'none';
-                titleModal.style.display = 'flex';
+            // Dropdown
+            const dd = document.createElement('div');
+            dd.className = 'dropdown';
+            const thumbBtn = document.createElement('button');
+            thumbBtn.textContent = 'Change Thumbnail';
+            thumbBtn.onclick = e => { e.stopPropagation(); openThumb(y, v.filename); };
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete';
+            delBtn.textContent = 'Delete Video';
+            delBtn.onclick = e => { e.stopPropagation(); deleteVid(y, v.filename); };
+            const ytBtn = document.createElement('button');
+            ytBtn.textContent = 'Upload to YouTube';
+            ytBtn.onclick = e => { e.stopPropagation(); openYtUpload(y, v.filename, v.title); };
+            dd.append(thumbBtn, ytBtn, delBtn);
+
+            // Clickable content area
+            const content = document.createElement('div');
+            content.style.height = '100%';
+            content.onclick = () => openPlayer(path);
+
+            if (v.thumb) {
+                const img = document.createElement('img');
+                img.src = `/library/${safeYear}/${encodeURIComponent(v.thumb)}?t=${Date.now()}`;
+                img.alt = v.title;
+                content.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.style.cssText = 'height:100%; display:flex; align-items:center; justify-content:center; font-size:3rem; color:var(--text-muted)';
+                placeholder.textContent = '🎞️';
+                content.appendChild(placeholder);
             }
-        };
 
-        btnSaveLibrary.onclick = async () => {
-            const title = videoTitleInput.value || "My Movie";
-            btnSaveLibrary.disabled = true;
-            btnSaveLibrary.innerText = "SAVING...";
-            try {
-                await fetch('/save-to-library', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ year: currentProcessedYear, title: title }) });
-                titleModal.style.display = 'none';
-                btnSaveLibrary.disabled = false;
-                btnSaveLibrary.innerText = "SAVE TO LIBRARY";
-                videoTitleInput.value = "";
-                await loadLibrary();
-                const yearDataResponse = await fetch('/library-data');
-                const libraryData = await yearDataResponse.json();
-                showYear(currentProcessedYear, libraryData[currentProcessedYear]);
-            } catch (err) { alert("Error saving: " + err); }
-        };
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            const titleDiv = document.createElement('div');
+            titleDiv.textContent = v.title;  // textContent = XSS safe
+            overlay.appendChild(titleDiv);
+            content.appendChild(overlay);
+
+            card.append(menuBtn, dd, content);
+            grid.appendChild(card);
+        });
+
+        view.appendChild(grid);
+        $('mainContent').appendChild(view);
+        document.querySelectorAll('.year-link').forEach(l =>
+            l.classList.toggle('active', l.textContent === y)
+        );
+    }
+
+    /* ------------------------------------------------------------------
+     * Card actions
+     * ----------------------------------------------------------------*/
+    function toggleMenu(e) {
+        const dd = e.target.nextElementSibling;
+        const isVisible = dd.style.display === 'flex';
+        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+        dd.style.display = isVisible ? 'none' : 'flex';
+        document.addEventListener('click', () => dd.style.display = 'none', { once: true });
+    }
+
+    async function deleteVid(y, f) {
+        if (!confirm(`Are you sure you want to delete "${f}"?`)) return;
+        try {
+            const res = await fetch('/delete-video', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ year: y, filename: f }),
+            });
+            if (!res.ok) throw new Error('Delete failed');
+            const data = await (await fetch('/library-data')).json();
+            if (data[y]) showYear(y, data[y]); else showUpload();
+            loadLib();
+        } catch (err) {
+            showError('Failed to delete video');
+            console.error(err);
+        }
+    }
+
+    async function openThumb(y, f) {
+        currentVid = { y, f };
+        await loadThumbOptions('/thumbnail-options');
+    }
+
+    async function refreshThumbs() {
+        await loadThumbOptions('/thumbnail-options-refresh');
+    }
+
+    async function loadThumbOptions(endpoint) {
+        $('thumbOptions').innerHTML = '';
+        $('thumbLoader').style.display = 'block';
+        $('btnRefreshThumbs').disabled = true;
+        $('thumbModal').style.display = 'flex';
+
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ year: currentVid.y, filename: currentVid.f }),
+            });
+            if (!res.ok) throw new Error('Failed to generate options');
+            const { options } = await res.json();
+
+            $('thumbLoader').style.display = 'none';
+            $('btnRefreshThumbs').disabled = false;
+            options.forEach((opt, idx) => {
+                const card = document.createElement('div');
+                card.className = 'thumb-option';
+                card.onclick = () => selectThumb(idx, card);
+
+                const img = document.createElement('img');
+                img.src = `/thumbnail-preview/${opt.filename}?t=${Date.now()}`;
+                img.alt = 'Thumbnail option';
+
+                card.appendChild(img);
+                $('thumbOptions').appendChild(card);
+            });
+        } catch (err) {
+            $('thumbLoader').style.display = 'none';
+            $('btnRefreshThumbs').disabled = false;
+            showError('Failed to load thumbnail options');
+            closeModal('thumbModal');
+            console.error(err);
+        }
+    }
+
+    async function selectThumb(optionIndex, card) {
+        card.classList.add('selected');
+        try {
+            const res = await fetch('/select-thumbnail', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    year: currentVid.y,
+                    filename: currentVid.f,
+                    option_index: optionIndex,
+                }),
+            });
+            if (!res.ok) throw new Error('Thumbnail update failed');
+            closeModal('thumbModal');
+            const data = await (await fetch('/library-data')).json();
+            showYear(currentVid.y, data[currentVid.y]);
+        } catch (err) {
+            showError('Failed to update thumbnail');
+            console.error(err);
+        }
+    }
+
+    /* ------------------------------------------------------------------
+     * YouTube upload
+     * ----------------------------------------------------------------*/
+    let ytCurrent = {};
+
+    async function openYtUpload(year, filename, title) {
+        ytCurrent = { year, filename };
+        $('ytTitle').value = title || '';
+        $('ytDesc').value = '';
+        $('ytPrivacy').value = 'private';
+        $('ytForm').style.display = 'block';
+        $('ytStatus').style.display = 'none';
+        $('ytLoader').style.display = 'none';
+        $('ytError').style.display = 'none';
+        $('ytCancel').textContent = 'Cancel';
+        $('btnYtUpload').disabled = false;
+
+        // Check if YouTube is configured & authenticated
+        try {
+            const res = await fetch('/youtube/status');
+            const st = await res.json();
+            if (!st.configured) {
+                $('ytForm').style.display = 'none';
+                $('ytStatus').style.display = 'block';
+                $('ytStatus').innerHTML = '<p style="color:var(--text-dim)">Place a <strong>client_secrets.json</strong> from the <a href="https://console.cloud.google.com/apis/credentials" style="color:var(--primary)">Google Cloud Console</a> in the Gather app folder to enable YouTube uploads.</p>';
+                $('ytModal').style.display = 'flex';
+                return;
+            }
+            if (!st.authenticated) {
+                await ytAuth();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+
+        $('ytModal').style.display = 'flex';
+    }
+
+    async function ytAuth() {
+        $('ytForm').style.display = 'none';
+        $('ytStatus').style.display = 'block';
+        $('ytStatus').innerHTML = '<p style="color:var(--text-dim)">Signing in with Google… check your browser.</p>';
+        $('ytLoader').style.display = 'block';
+        $('ytModal').style.display = 'flex';
+
+        try {
+            const res = await fetch('/youtube/auth', { method: 'POST' });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Auth failed');
+            $('ytLoader').style.display = 'none';
+            $('ytForm').style.display = 'block';
+            $('ytStatus').style.display = 'none';
+        } catch (err) {
+            $('ytLoader').style.display = 'none';
+            $('ytError').textContent = err.message;
+            $('ytError').style.display = 'block';
+        }
+    }
+
+    $('btnYtUpload').onclick = async () => {
+        const btn = $('btnYtUpload');
+        btn.disabled = true;
+        btn.textContent = 'UPLOADING…';
+        $('ytLoader').style.display = 'block';
+        $('ytError').style.display = 'none';
+
+        try {
+            const res = await fetch('/youtube/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    year: ytCurrent.year,
+                    filename: ytCurrent.filename,
+                    title: $('ytTitle').value || 'My Video',
+                    description: $('ytDesc').value,
+                    privacy: $('ytPrivacy').value,
+                }),
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Upload failed');
+
+            const data = await res.json();
+            $('ytLoader').style.display = 'none';
+            $('ytForm').style.display = 'none';
+            $('ytStatus').style.display = 'block';
+            $('ytStatus').className = 'yt-success';
+            $('ytStatus').innerHTML = '✅ Uploaded! <a href="' + data.url + '" target="_blank">Watch on YouTube</a>';
+            $('ytCancel').textContent = 'Done';
+        } catch (err) {
+            $('ytLoader').style.display = 'none';
+            $('ytError').textContent = err.message;
+            $('ytError').style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'UPLOAD';
+        }
+    };
+
+    /* ------------------------------------------------------------------
+     * Upload & stitch flow
+     * ----------------------------------------------------------------*/
+    $('fileInput').onchange = () => {
+        const files = Array.from($('fileInput').files);
+        $('fileList').innerHTML = '';
+        files.forEach(f => {
+            const row = document.createElement('div');
+            row.style.cssText = 'background:var(--surface); padding:0.8rem 1.2rem; margin-bottom:0.5rem; border-radius:1rem; border:1px solid var(--border); font-size:0.85rem; color:var(--text-dim); font-weight:600; box-shadow:0 2px 8px var(--shadow-soft)';
+            row.textContent = f.name;  // textContent = XSS safe
+            $('fileList').appendChild(row);
+        });
+        $('btnGo').style.display = files.length ? 'block' : 'none';
+    };
+
+    $('btnGo').onclick = async () => {
+        resetUploadUI();
+        $('loader').style.display = 'block';
+        $('status').style.display = 'block';
+        try {
+            const fd = new FormData();
+            Array.from($('fileInput').files).forEach(f => fd.append('files', f));
+            const res = await fetch('/upload', { method: 'POST', body: fd });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || 'Upload failed');
+            }
+            const data = await res.json();
+            currentYear = data.year;
+            resetUploadUI();
+            $('vTitle').value = '';
+            $('titleModal').style.display = 'flex';
+        } catch (err) {
+            resetUploadUI();
+            showError(err.message || 'Something went wrong during processing');
+            console.error(err);
+        }
+    };
+
+    $('btnSave').onclick = async () => {
+        const btn = $('btnSave');
+        btn.textContent = 'SAVING...';
+        btn.disabled = true;
+        try {
+            const res = await fetch('/save-to-library', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ year: currentYear, title: $('vTitle').value || 'My Movie' }),
+            });
+            if (!res.ok) throw new Error('Save failed');
+            closeModal('titleModal');
+            await loadLib();
+            const data = await (await fetch('/library-data')).json();
+            if (data[currentYear]) showYear(currentYear, data[currentYear]);
+        } catch (err) {
+            showError('Failed to save to library');
+            console.error(err);
+        } finally {
+            btn.textContent = 'SAVE TO LIBRARY';
+            btn.disabled = false;
+        }
+    };
+
+    /* ------------------------------------------------------------------
+     * Init
+     * ----------------------------------------------------------------*/
+    loadLib();
     </script>
 </body>
 </html>

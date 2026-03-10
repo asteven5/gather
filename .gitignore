@@ -1,11 +1,20 @@
+# Runtime directories
 uploads/
 output/
 library/
-.DS_Store
+
+# Python
 __pycache__/
+*.pyc
 .venv/
-*.mp4
-*.MOV
-*.mov
-*.jpg
-*.png
+
+# macOS
+.DS_Store
+
+# Secrets & credentials — NEVER commit these
+client_secrets.json
+youtube_tokens.json
+GIT Token.rtf
+
+# Logs
+*.log

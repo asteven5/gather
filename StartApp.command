@@ -21,10 +21,5 @@ fi
 
 # Run the app using uv to handle dependencies automatically
 echo "Starting Gather..."
-uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz main.py &
-
-
-sleep 2
-open http://127.0.0.1:8000
-echo "App is running! Keep this window open while using the app."
-wait
+uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview main.py
+echo "Gather has closed."

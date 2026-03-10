@@ -1,6 +1,8 @@
-fastapi
-uvicorn
-python-multipart
-jinja2
-Pillow
-pytz
+fastapi==0.135.1
+uvicorn==0.41.0
+python-multipart==0.0.22
+Pillow==12.1.1
+pytz==2026.1.post1
+pywebview==5.4
+google-api-python-client==2.164.0
+google-auth-oauthlib==1.2.1
