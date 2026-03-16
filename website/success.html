@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You — Gather</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playball&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .success-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        .success-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 4rem 3rem;
+            max-width: 520px;
+            box-shadow: 0 8px 30px var(--shadow-soft);
+        }
+        .success-icon { font-size: 4rem; margin-bottom: 1.5rem; }
+        .success-card h1 {
+            font-family: 'Playball', cursive;
+            font-size: 2.8rem;
+            color: var(--primary-hover);
+            margin-bottom: 1rem;
+        }
+        .success-card p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        .success-email { font-weight: 700; color: var(--text); }
+        .success-loading { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="success-page">
+        <div class="success-card" id="successCard">
+            <div class="success-icon">✨</div>
+            <h1>Thank You!</h1>
+            <p id="successMsg" class="success-loading">Confirming your purchase...</p>
+            <a href="/" class="btn btn-primary">Back to Gather</a>
+        </div>
+    </div>
+    <script>
+        (async () => {
+            const params = new URLSearchParams(window.location.search);
+            const sessionId = params.get('session_id');
+            const msgEl = document.getElementById('successMsg');
+
+            if (!sessionId) {
+                msgEl.textContent = 'No session found. If you completed a purchase, check your email for confirmation.';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/session-status?session_id=' + sessionId);
+                const session = await res.json();
+
+                if (session.status === 'complete') {
+                    const email = session.customer_email || 'your email';
+                    msgEl.innerHTML =
+                        'Your purchase is complete! A confirmation has been sent to ' +
+                        '<span class="success-email">' + email + '</span>.' +
+                        '<br><br>Download links are on the way. 🎬';
+                } else if (session.status === 'open') {
+                    window.location.href = '/';
+                } else {
+                    msgEl.textContent = 'Something went wrong. Please contact support.';
+                }
+            } catch (err) {
+                console.error(err);
+                msgEl.textContent = 'Unable to verify purchase. Check your email for confirmation.';
+            }
+        })();
+    </script>
+</body>
+</html>
