@@ -2,29 +2,43 @@
 
 import asyncio
 import shutil
+import threading
+import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 
 from config import BASE_DIR, LIBRARY_DIR, OUTPUT_DIR, UPLOAD_DIR, logger
 from models import (
     DeleteVideoRequest,
+    DriveUploadRequest,
     SaveToLibraryRequest,
     SelectThumbnailRequest,
     UpdateThumbnailRequest,
     YouTubeUploadRequest,
 )
+import drive_service
+import update_service
 import youtube_service
-from video_service import (
+from thumbnail_service import (
     apply_thumbnail_option,
-    cleanup_uploads,
-    format_creation_date,
     generate_thumbnail,
     generate_thumbnail_options,
-    get_creation_datetime,
-    process_videos,
 )
+from video_service import (
+    StitchCancelled,
+    VideoMeta,
+    cleanup_uploads,
+    probe_video,
+    process_videos_fast,
+    process_videos_polished,
+)
+
+# In-memory task tracker for long-running video processing jobs.
+# Keyed by task_id → {"status": "processing"|"done"|"error", ...}
+_tasks: dict[str, dict] = {}
+_cancel_flags: dict[str, threading.Event] = {}
 
 router = APIRouter()
 
@@ -38,12 +52,82 @@ async def index():
     return (BASE_DIR / "index.html").read_text()
 
 
+@router.get("/faq.js")
+async def faq_js():
+    """Serve the FAQ JavaScript module."""
+    return FileResponse(BASE_DIR / "faq.js", media_type="application/javascript")
+
+
+# ---------------------------------------------------------------------------
+# Window focus (called by Dock icon reopen handler)
+# ---------------------------------------------------------------------------
+@router.get("/focus")
+async def focus_window():
+    """Bring the Gather window to the front."""
+    try:
+        import webview
+        for w in webview.windows:
+            w.restore()
+            w.show()
+    except Exception:
+        pass
+    return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Update check
+# ---------------------------------------------------------------------------
+@router.get("/check-update")
+async def check_update():
+    """Check if a newer version of Gather is available."""
+    import asyncio
+    result = await asyncio.to_thread(update_service.check_for_update)
+    return result or {"update_available": False}
+
+
 # ---------------------------------------------------------------------------
 # Upload & processing
 # ---------------------------------------------------------------------------
+def _run_processing(
+    task_id: str,
+    metadata: list[VideoMeta],
+    year: str,
+    mode: str,
+) -> None:
+    """Background worker: process & stitch videos, then update task status."""
+    cancel_event = _cancel_flags.get(task_id, threading.Event())
+
+    def cancel_check() -> None:
+        if cancel_event.is_set():
+            raise StitchCancelled("Stitching cancelled by user")
+
+    try:
+        if mode == "polished":
+            process_videos_polished(metadata, cancel_check=cancel_check)
+        else:
+            process_videos_fast(metadata, cancel_check=cancel_check)
+        _tasks[task_id] = {"status": "done", "year": year}
+        logger.info("Task %s finished successfully.", task_id)
+    except StitchCancelled:
+        _tasks[task_id] = {"status": "cancelled"}
+        logger.info("Task %s was cancelled by user.", task_id)
+    except Exception as exc:
+        logger.exception("Task %s failed", task_id)
+        _tasks[task_id] = {"status": "error", "detail": str(exc)}
+    finally:
+        _cancel_flags.pop(task_id, None)
+
+
 @router.post("/upload")
-async def upload_videos(files: list[UploadFile] = File(...)):
-    """Upload video files, process them, and stitch into a single movie."""
+async def upload_videos(
+    files: list[UploadFile] = File(...),
+    mode: str = Form("fast"),
+):
+    """Upload video files and kick off processing in the background.
+
+    Accepts a ``mode`` form field: ``"fast"`` (subtitle dates, no re-encode)
+    or ``"polished"`` (dates burned into the first few seconds).
+    """
     try:
         cleanup_uploads()
 
@@ -54,19 +138,46 @@ async def upload_videos(files: list[UploadFile] = File(...)):
                 shutil.copyfileobj(file.file, buf)
             filenames.append(file.filename)
 
-        first_dt = get_creation_datetime(UPLOAD_DIR / filenames[0])
-        year = str(first_dt.year)
+        # Probe all videos once (Change 2).
+        metadata = [probe_video(UPLOAD_DIR / name) for name in filenames]
+        metadata.sort(key=lambda m: m.creation_dt)
 
-        filenames.sort(key=lambda name: get_creation_datetime(UPLOAD_DIR / name))
+        year = str(metadata[0].creation_dt.year)
 
-        # Run blocking ffmpeg work off the event loop so the server stays
-        # responsive to other requests while encoding.
-        await asyncio.to_thread(process_videos, filenames)
+        task_id = uuid.uuid4().hex
+        _tasks[task_id] = {"status": "processing", "year": year}
+        _cancel_flags[task_id] = threading.Event()
 
-        return {"status": "success", "year": year}
+        thread = threading.Thread(
+            target=_run_processing,
+            args=(task_id, metadata, year, mode),
+            daemon=True,
+        )
+        thread.start()
+
+        return {"status": "processing", "task_id": task_id, "year": year}
     except Exception as exc:
-        logger.exception("Upload processing failed")
+        logger.exception("Upload failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/upload/status/{task_id}")
+async def upload_status(task_id: str):
+    """Poll the progress of a background video-processing task."""
+    task = _tasks.get(task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Unknown task")
+    return task
+
+
+@router.post("/upload/cancel/{task_id}")
+async def cancel_task(task_id: str):
+    """Cancel a running video-processing task."""
+    flag = _cancel_flags.get(task_id)
+    if flag is None:
+        raise HTTPException(status_code=404, detail="Unknown or already finished task")
+    flag.set()
+    return {"status": "cancelling"}
 
 
 # ---------------------------------------------------------------------------
@@ -184,7 +295,12 @@ async def get_library_data():
         if not year_dir.is_dir():
             continue
         videos = []
-        for video in sorted(year_dir.glob("*.mp4"), reverse=True):
+        mp4s = sorted(
+            year_dir.glob("*.mp4"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for video in mp4s:
             thumb_name = video.stem + ".jpg"
             videos.append({
                 "title": video.stem,
@@ -223,7 +339,7 @@ async def youtube_auth():
 
 @router.post("/youtube/upload")
 async def youtube_upload(data: YouTubeUploadRequest):
-    """Upload a library video to YouTube."""
+    """Kick off a YouTube upload in the background and return a task ID."""
     video_path = LIBRARY_DIR / data.year / data.filename
     if not video_path.exists():
         raise HTTPException(status_code=404, detail="Video not found")
@@ -231,18 +347,77 @@ async def youtube_upload(data: YouTubeUploadRequest):
     if not youtube_service.is_authenticated():
         raise HTTPException(status_code=401, detail="Not authenticated with YouTube")
 
+    task_id = uuid.uuid4().hex
+    _tasks[task_id] = {"status": "uploading", "service": "youtube"}
+
+    def _worker() -> None:
+        try:
+            result = youtube_service.upload_video(
+                video_path, data.title, data.description, data.privacy,
+            )
+            _tasks[task_id] = {"status": "done", "service": "youtube", **result}
+        except youtube_service.AuthExpiredError as exc:
+            _tasks[task_id] = {"status": "auth_expired", "detail": str(exc)}
+        except Exception as exc:
+            logger.exception("YouTube upload failed")
+            _tasks[task_id] = {"status": "error", "detail": str(exc)}
+
+    threading.Thread(target=_worker, daemon=True).start()
+    return {"status": "uploading", "task_id": task_id}
+
+
+# ---------------------------------------------------------------------------
+# Google Drive
+# ---------------------------------------------------------------------------
+@router.get("/drive/status")
+async def drive_status():
+    """Check whether Google Drive is configured and authenticated."""
+    return {
+        "configured": drive_service.is_configured(),
+        "authenticated": drive_service.is_authenticated(),
+    }
+
+
+@router.post("/drive/auth")
+async def drive_auth():
+    """Start the Google Drive OAuth2 flow (opens a browser window)."""
     try:
-        result = await asyncio.to_thread(
-            youtube_service.upload_video,
-            video_path,
-            data.title,
-            data.description,
-            data.privacy,
-        )
-        return result
+        await asyncio.to_thread(drive_service.authenticate)
+        return {"status": "success"}
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        logger.exception("YouTube upload failed")
+        logger.exception("Drive auth failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.post("/drive/upload")
+async def drive_upload(data: DriveUploadRequest):
+    """Kick off a Google Drive upload in the background and return a task ID."""
+    video_path = LIBRARY_DIR / data.year / data.filename
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    if not drive_service.is_authenticated():
+        raise HTTPException(
+            status_code=401, detail="Not authenticated with Google Drive",
+        )
+
+    task_id = uuid.uuid4().hex
+    _tasks[task_id] = {"status": "uploading", "service": "drive"}
+
+    def _worker() -> None:
+        try:
+            result = drive_service.upload_video(video_path, data.title)
+            _tasks[task_id] = {"status": "done", "service": "drive", **result}
+        except drive_service.AuthExpiredError as exc:
+            _tasks[task_id] = {"status": "auth_expired", "detail": str(exc)}
+        except Exception as exc:
+            logger.exception("Drive upload failed")
+            _tasks[task_id] = {"status": "error", "detail": str(exc)}
+
+    threading.Thread(target=_worker, daemon=True).start()
+    return {"status": "uploading", "task_id": task_id}
 
 
 @router.get("/library/{year}/{filename}")

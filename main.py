@@ -10,9 +10,11 @@ from fastapi import FastAPI
 
 from config import HOST, PORT
 from routes import router
+from stripe_routes import router as stripe_router
 
 app = FastAPI(title="Gather", description="Home Video Maker")
 app.include_router(router)
+app.include_router(stripe_router)
 
 
 def _start_server():
@@ -41,6 +43,7 @@ def _set_macos_app_name(name: str):
         info["CFBundleName"] = name
     except ImportError:
         pass  # not on macOS
+
 
 
 class _GatherApi:

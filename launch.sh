@@ -6,4 +6,9 @@ export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/opt/homebrew/bin:
 
 cd "$(dirname "$0")"
 
+# Support both dev layout (files here) and distribution layout (_internal/)
+if [ -d "_internal" ]; then
+    cd _internal
+fi
+
 exec uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview main.py

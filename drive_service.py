@@ -1,6 +1,5 @@
-"""YouTube upload service — OAuth2 authentication and video upload."""
+"""Google Drive upload service — OAuth2 authentication and file upload."""
 
-import json
 from pathlib import Path
 
 from config import BASE_DIR, logger
@@ -9,9 +8,11 @@ from config import BASE_DIR, logger
 # Paths
 # ---------------------------------------------------------------------------
 CLIENT_SECRETS_FILE = BASE_DIR / "client_secrets.json"
-TOKEN_FILE = BASE_DIR / "youtube_tokens.json"
+TOKEN_FILE = BASE_DIR / "drive_tokens.json"
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+
+DRIVE_FOLDER_NAME = "Gather"
 
 
 # ---------------------------------------------------------------------------
@@ -57,7 +58,7 @@ def authenticate() -> None:
     with open(TOKEN_FILE, "w") as fh:
         fh.write(creds.to_json())
 
-    logger.info("YouTube authentication successful")
+    logger.info("Google Drive authentication successful")
 
 
 class AuthExpiredError(Exception):
@@ -82,9 +83,9 @@ def _get_credentials():
             creds.refresh(Request())
         except RefreshError:
             TOKEN_FILE.unlink(missing_ok=True)
-            logger.warning("YouTube refresh token expired — deleted stale token file")
+            logger.warning("Drive refresh token expired — deleted stale token file")
             raise AuthExpiredError(
-                "Your YouTube authorization has expired. Please re-authenticate."
+                "Your Google Drive authorization has expired. Please re-authenticate."
             )
         with open(TOKEN_FILE, "w") as fh:
             fh.write(creds.to_json())
@@ -92,46 +93,67 @@ def _get_credentials():
 
 
 # ---------------------------------------------------------------------------
+# Folder helpers
+# ---------------------------------------------------------------------------
+def _get_or_create_folder(service, name: str) -> str:
+    """Find or create a top-level Drive folder, returning its ID."""
+    query = (
+        f"name = '{name}' "
+        "and mimeType = 'application/vnd.google-apps.folder' "
+        "and trashed = false"
+    )
+    results = (
+        service.files()
+        .list(q=query, spaces="drive", fields="files(id)")
+        .execute()
+    )
+
+    files = results.get("files", [])
+    if files:
+        return files[0]["id"]
+
+    metadata = {
+        "name": name,
+        "mimeType": "application/vnd.google-apps.folder",
+    }
+    folder = service.files().create(body=metadata, fields="id").execute()
+    logger.info("Created Drive folder '%s' (id=%s)", name, folder["id"])
+    return folder["id"]
+
+
+# ---------------------------------------------------------------------------
 # Upload
 # ---------------------------------------------------------------------------
-def upload_video(
-    video_path: Path,
-    title: str = "My Video",
-    description: str = "",
-    privacy: str = "private",
-) -> dict:
-    """Upload *video_path* to YouTube.
+def upload_video(video_path: Path, title: str = "My Video") -> dict:
+    """Upload *video_path* to Google Drive inside a 'Gather' folder.
 
-    Returns ``{"id": "...", "url": "https://youtube.com/watch?v=..."}``.
+    Returns ``{"id": "...", "url": "https://drive.google.com/file/d/..."}``.
     """
     from googleapiclient.discovery import build
     from googleapiclient.http import MediaFileUpload
 
     creds = _get_credentials()
-    youtube = build("youtube", "v3", credentials=creds)
+    service = build("drive", "v3", credentials=creds)
 
-    body = {
-        "snippet": {
-            "title": title,
-            "description": description,
-            "categoryId": "22",  # People & Blogs
-        },
-        "status": {
-            "privacyStatus": privacy,
-        },
+    folder_id = _get_or_create_folder(service, DRIVE_FOLDER_NAME)
+
+    filename = title if title.lower().endswith(".mp4") else f"{title}.mp4"
+    file_metadata = {
+        "name": filename,
+        "parents": [folder_id],
     }
 
     media = MediaFileUpload(
         str(video_path),
         mimetype="video/mp4",
         resumable=True,
-        chunksize=10 * 1024 * 1024,  # 10 MB chunks
+        chunksize=10 * 1024 * 1024,
     )
 
-    request = youtube.videos().insert(
-        part="snippet,status",
-        body=body,
+    request = service.files().create(
+        body=file_metadata,
         media_body=media,
+        fields="id",
     )
 
     response = None
@@ -139,13 +161,13 @@ def upload_video(
         status, response = request.next_chunk()
         if status:
             logger.info(
-                "YouTube upload %d%% complete", int(status.progress() * 100),
+                "Drive upload %d%% complete", int(status.progress() * 100),
             )
 
-    video_id = response["id"]
-    logger.info("YouTube upload finished — video ID: %s", video_id)
+    file_id = response["id"]
+    logger.info("Drive upload finished — file ID: %s", file_id)
 
     return {
-        "id": video_id,
-        "url": f"https://youtube.com/watch?v={video_id}",
+        "id": file_id,
+        "url": f"https://drive.google.com/file/d/{file_id}/view",
     }

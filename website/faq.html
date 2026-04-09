@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs — Gather | Home Video Maker</title>
+    <meta name="description" content="Got questions about Gather? Learn about Fast Stitch vs Polished Stitch, supported formats, pricing, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playball&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ─── Nav ─────────────────────────────────────────────────────── -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">Gather</a>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/#how-it-works">How It Works</a>
+                <a href="/faq">FAQs</a>
+                <a href="/" class="nav-cta" onclick="openCheckout(); return false;">Get It — $9.99</a>
+            </div>
+            <button class="nav-toggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ─── Hero ────────────────────────────────────────────────────── -->
+    <header class="faq-hero">
+        <p class="section-badge">You've got questions</p>
+        <h1 class="section-title">Frequently Asked Questions</h1>
+        <p class="faq-hero-sub">
+            Everything you need to know about Gather — from stitching
+            modes to supported formats. If it's not here, reach out!
+        </p>
+    </header>
+
+    <!-- ─── General ─────────────────────────────────────────────────── -->
+    <section class="faq-section">
+        <div class="section-inner">
+            <h2 class="faq-group-title">General</h2>
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What is Gather?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Gather is a desktop app that turns your scattered phone clips and camera footage into one beautiful home video. Drop your clips in, hit stitch, and you've got a real movie — with date stamps, a thumbnail, and easy uploads to YouTube or Google Drive.</p>
+                            <p>Think of it as the missing step between "I have 47 clips from vacation" and "We have a movie to watch on the couch."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How much does Gather cost?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p><strong>$9.99 — one time, yours forever.</strong> No subscriptions, no recurring charges, no "premium tiers." Pay once, get the full app. That's it.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What platforms does Gather run on?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p><strong>Mac</strong>, <strong>Windows</strong>, and <strong>Linux</strong>. Gather takes advantage of your computer's hardware to keep stitching fast on all three.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Does Gather need an internet connection?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Nope! Gather works <strong>completely offline</strong>. Your videos never leave your computer unless you choose to upload them to YouTube or Google Drive.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        What video formats can I use?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Pretty much anything — <strong>MP4, MOV, MKV, AVI</strong>, and more. If your phone or camera recorded it, Gather can handle it.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Does Gather collect any of my data?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p><strong>No.</strong> No accounts, no tracking, no analytics. Gather doesn't upload anything unless you explicitly ask it to. Your family videos are your business.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Stitching Modes ─────────────────────────────────────────── -->
+    <section class="faq-section">
+        <div class="section-inner">
+            <h2 class="faq-group-title">Stitching Modes</h2>
+            <div class="faq-list">
+
+                <div class="faq-item open">
+                    <button class="faq-question" aria-expanded="true">
+                        What's the difference between Fast Stitch and Polished Stitch?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Gather gives you two ways to combine your clips:</p>
+
+                            <div class="faq-compare">
+                                <div class="faq-compare-card">
+                                    <h4>⚡ Fast Stitch</h4>
+                                    <ul>
+                                        <li>Combines your clips <strong>almost instantly</strong></li>
+                                        <li>Dates appear as <strong>captions</strong> you can turn on or off</li>
+                                        <li>No quality loss at all</li>
+                                    </ul>
+                                </div>
+                                <div class="faq-compare-card">
+                                    <h4>🎬 Polished Stitch</h4>
+                                    <ul>
+                                        <li>Takes a bit longer to process</li>
+                                        <li>Dates are <strong>permanently part of the video</strong></li>
+                                        <li>Visible everywhere — TVs, YouTube, social media</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p><strong>In short:</strong> Fast Stitch is instant and the dates work like subtitles you can toggle. Polished Stitch takes longer but bakes the dates right into the video so they show up no matter where you watch it.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Which mode should I pick?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>For most people, <strong>Fast Stitch</strong> is all you need — it's the default for a reason. Pick <strong>Polished Stitch</strong> if you're planning to upload to YouTube, share on social media, or watch on a TV that might not display captions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Can I mix clips from different phones or cameras?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Absolutely! Throw in iPhone clips, GoPro footage, and old camcorder files all in the same project. Gather sorts out the differences automatically and makes them play together seamlessly.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Features ────────────────────────────────────────────────── -->
+    <section class="faq-section">
+        <div class="section-inner">
+            <h2 class="faq-group-title">Features</h2>
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How do date stamps work?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Gather automatically reads the date each clip was recorded and displays it on screen — like "March 14, 2025." You don't need to do anything; it just picks up the info from your video files.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Can I choose my own thumbnail?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Yes! After stitching, Gather shows you a few frame options from your video. Pick the one you like, or shuffle for more choices. That's the image that shows up in your library.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Can I upload to YouTube or Google Drive?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Yep — one click for each. Set a title and privacy level for YouTube, or just a title for Drive, and you're done. No extra apps needed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        How does the library work?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Every finished video is saved to your library, <strong>organized by year</strong>. Browse by year in the sidebar, click any video to play it, or use the menu to rename, delete, change the thumbnail, or upload.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" aria-expanded="false">
+                        Can I cancel stitching if I change my mind?
+                        <svg class="faq-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            <p>Of course. Hit "Cancel Stitching" anytime and Gather stops cleanly — no leftover junk or half-finished files.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── CTA ─────────────────────────────────────────────────────── -->
+    <section class="faq-cta">
+        <div class="section-inner">
+            <h2 class="section-title">Still have questions?</h2>
+            <p>The best way to understand Gather is to just try it.</p>
+            <a href="/" class="btn btn-primary btn-lg" onclick="openCheckout(); return false;">Get Gather — $9.99</a>
+        </div>
+    </section>
+
+    <!-- ─── Footer ──────────────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="section-inner">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span class="footer-logo">Gather</span>
+                    <p>Home Video Maker</p>
+                </div>
+                <div class="footer-links">
+                    <a href="/#features">Features</a>
+                    <a href="/#how-it-works">How It Works</a>
+                    <a href="/faq">FAQs</a>
+                </div>
+                <p class="footer-copy">&copy; 2025 Gather. Made with love for families everywhere.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ─── FAQ Accordion Logic ─────────────────────────────────────── -->
+    <script>
+    (() => {
+        'use strict';
+
+        /* ── Accordion toggle ──────────────────────────────────────── */
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.faq-item');
+                const isOpen = item.classList.contains('open');
+
+                item.closest('.faq-list')
+                    .querySelectorAll('.faq-item.open')
+                    .forEach(el => {
+                        el.classList.remove('open');
+                        el.querySelector('.faq-question')
+                          .setAttribute('aria-expanded', 'false');
+                    });
+
+                if (!isOpen) {
+                    item.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+        /* ── Nav scroll shadow ─────────────────────────────────────── */
+        const nav = document.querySelector('.nav');
+        const onScroll = () => {
+            nav.classList.toggle('scrolled', window.scrollY > 10);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        /* ── Mobile menu toggle ────────────────────────────────────── */
+        const toggle = document.querySelector('.nav-toggle');
+        const links  = document.querySelector('.nav-links');
+        toggle.addEventListener('click', () => links.classList.toggle('open'));
+        links.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => links.classList.remove('open'));
+        });
+
+        /* ── Scroll fade-in ────────────────────────────────────────── */
+        const animatedElements = document.querySelectorAll('.faq-item, .faq-group-title');
+        animatedElements.forEach(el => el.classList.add('fade-in'));
+
+        const observer = new IntersectionObserver(
+            entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+        );
+        animatedElements.forEach(el => observer.observe(el));
+
+        document.querySelectorAll('.faq-item').forEach((item, i) => {
+            item.style.transitionDelay = `${i * 0.04}s`;
+        });
+    })();
+    </script>
+
+</body>
+</html>

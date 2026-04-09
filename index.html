@@ -28,7 +28,7 @@
         body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: stretch; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
         /* Sidebar */
-        .sidebar { width: 280px; padding: 3.5rem 2.5rem; background: var(--sidebar-bg); border-right: 1px solid var(--border); flex-shrink: 0; overflow-y: auto; z-index: 100; }
+        .sidebar { width: 280px; padding: 3.5rem 2.5rem; background: var(--sidebar-bg); border-right: 1px solid var(--border); flex-shrink: 0; overflow-y: auto; z-index: 100; display: flex; flex-direction: column; }
         .sidebar h2 { font-size: 1.1rem; margin-bottom: 2.5rem; text-transform: uppercase; letter-spacing: 0.35em; font-weight: 700; color: var(--text-muted); }
         .year-link { display: block; color: var(--text); text-decoration: none; font-size: 1.05rem; margin-bottom: 0.4rem; padding: 0.75rem 1.2rem; border-radius: 1rem; opacity: 0.55; transition: all 0.25s ease; cursor: pointer; font-weight: 600; }
         .year-link:hover { opacity: 0.85; background: var(--surface); box-shadow: 0 2px 8px var(--shadow-soft); }
@@ -52,10 +52,12 @@
 
         /* Video Grid */
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
-        .video-card { position: relative; border-radius: 1.5rem; overflow: hidden; aspect-ratio: 1; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface); border: 1px solid var(--border); box-shadow: 0 4px 16px var(--shadow-soft); }
+        .video-card { position: relative; border-radius: 1.5rem; overflow: hidden; aspect-ratio: 1; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); background: var(--surface); border: 1px solid var(--border); box-shadow: 0 4px 16px var(--shadow-soft); -webkit-mask-image: -webkit-radial-gradient(white, black); }
         .video-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px var(--shadow-medium); border-color: var(--primary); }
         .video-card img { width: 100%; height: 100%; object-fit: cover; }
         .video-card .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 45%, rgba(62, 53, 50, 0.85)); display: flex; align-items: flex-end; padding: 2rem; color: white; font-weight: 700; font-size: 1.25rem; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .video-card .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); width: 64px; height: 64px; background: rgba(255,255,255,0.92); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 5; pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+        .video-card:hover .play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         /* Card Menu */
         .menu-btn { position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px; background: rgba(255,255,255,0.85); color: var(--text); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0; transition: 0.3s; font-size: 1.2rem; backdrop-filter: blur(10px); cursor: pointer; box-shadow: 0 2px 8px var(--shadow-soft); }
@@ -119,6 +121,59 @@
         .player-modal.is-fullscreen:hover .player-close,
         .player-modal.is-fullscreen:hover .player-fullscreen { opacity: 1; }
 
+
+
+
+        /* Update Banner */
+        .update-banner { display: none; max-width: 550px; margin: 0 auto 2rem; padding: 1rem 1.5rem; background: linear-gradient(135deg, rgba(141,170,145,0.10), rgba(212,165,116,0.10)); border: 1px solid var(--primary); border-radius: 1.2rem; text-align: left; animation: fadeIn 0.4s ease; }
+        .update-banner-inner { display: flex; align-items: center; gap: 1rem; }
+        .update-banner-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .update-banner-text { flex: 1; }
+        .update-banner-title { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.15rem; }
+        .update-banner-notes { font-size: 0.78rem; color: var(--text-dim); }
+        .update-banner-btn { flex-shrink: 0; background: var(--primary); color: #fff; border: none; padding: 0.5rem 1.2rem; font-size: 0.75rem; font-weight: 700; border-radius: 2rem; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s; }
+        .update-banner-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .update-banner-dismiss { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 0.2rem; line-height: 1; flex-shrink: 0; }
+        .update-banner-dismiss:hover { color: var(--text); }
+
+        /* Cancel Stitching */
+        .btn-cancel-stitch { display: block; margin: 1rem auto 0; padding: 0.7rem 2rem; background: none; color: var(--text-muted); border: 2px solid var(--border); border-radius: 3rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer; transition: all 0.25s ease; font-family: 'Nunito', sans-serif; }
+        .btn-cancel-stitch:hover { color: var(--danger, #c0392b); border-color: var(--danger, #c0392b); background: rgba(192,57,43,0.06); }
+
+        /* Mode Selector */
+        .mode-selector { display:none; max-width:550px; margin:1.5rem auto 0; }
+        .mode-options { display:flex; gap:0.8rem; }
+        .mode-option { display:flex; align-items:center; gap:0.8rem; flex:1; padding:1rem 1.2rem; border:2px solid var(--border); border-radius:1rem; cursor:pointer; transition:all 0.25s; background:var(--surface); user-select:none; }
+        .mode-option:hover { border-color:var(--primary); background:var(--surface-hover); }
+        .mode-option.active { border-color:var(--primary); background:var(--primary-glow); }
+        .mode-option .mode-icon { font-size:1.4rem; flex-shrink:0; }
+        .mode-option .mode-label { font-weight:700; font-size:0.9rem; color:var(--text); }
+        .mode-option .mode-desc { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+        /* FAQ View */
+        .faq-view { max-width: 680px; margin: 0 auto; text-align: left; animation: fadeIn 0.3s ease; }
+        .faq-view h1 { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+        .faq-view .faq-sub { text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 3rem; }
+        .faq-group { margin-bottom: 2.5rem; }
+        .faq-group h2 { font-family: 'Playball', cursive; font-size: 1.6rem; color: var(--primary-hover); margin-bottom: 1rem; text-align: center; }
+        .faq-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; margin-bottom: 0.6rem; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; }
+        .faq-card:hover { border-color: var(--primary); box-shadow: 0 4px 16px var(--shadow-soft); }
+        .faq-q { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 1rem 1.4rem; background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text); text-align: left; gap: 0.8rem; }
+        .faq-q:hover { color: var(--primary-hover); }
+        .faq-q .chevron { transition: transform 0.3s; font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
+        .faq-card.open .faq-q .chevron { transform: rotate(180deg); color: var(--primary-hover); }
+        .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .faq-card.open .faq-a { max-height: 500px; }
+        .faq-a-inner { padding: 0 1.4rem 1.2rem; font-size: 0.9rem; color: var(--text-dim); line-height: 1.75; }
+        .faq-a-inner p + p { margin-top: 0.6rem; }
+        .faq-a-inner strong { color: var(--text); }
+        .faq-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.8rem; }
+        .faq-cmp-card { background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
+        .faq-cmp-card h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .faq-cmp-card ul { list-style: none; padding: 0; }
+        .faq-cmp-card li { font-size: 0.8rem; color: var(--text-dim); padding: 0.15rem 0 0.15rem 1rem; position: relative; }
+        .faq-cmp-card li::before { content: '\2022'; position: absolute; left: 0; color: var(--primary); font-weight: 800; }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -127,10 +182,25 @@
     <div class="sidebar">
         <h2>My Videos</h2>
         <div id="yearList"></div>
+        <div style="margin-top:auto; padding-top:2rem; border-top:1px solid var(--border);">
+            <a class="year-link" onclick="showFaq()" style="opacity:0.7; font-size:0.9rem;">&#10067; FAQs</a>
+        </div>
     </div>
 
     <div class="container" id="mainContent">
         <div id="uploadView">
+            <!-- Update Banner (shown when a newer version exists) -->
+            <div class="update-banner" id="updateBanner">
+                <div class="update-banner-inner">
+                    <span class="update-banner-icon">🎉</span>
+                    <div class="update-banner-text">
+                        <div class="update-banner-title">Gather <span id="updateVersion"></span> is available!</div>
+                        <div class="update-banner-notes" id="updateNotes"></div>
+                    </div>
+                    <a class="update-banner-btn" id="updateLink" href="#" target="_blank">Update</a>
+                    <button class="update-banner-dismiss" onclick="dismissUpdate()" title="Dismiss">&times;</button>
+                </div>
+            </div>
             <h1>Gather</h1>
             <p class="subtitle">Home Video Maker</p>
             <p class="description">Stitch your video clips into seamless family home videos</p>
@@ -142,9 +212,28 @@
                 <input type="file" id="fileInput" multiple accept="video/*" style="display: none;">
             </div>
             <div id="fileList" style="max-width: 550px; margin: 0 auto; text-align: left"></div>
+            <div class="mode-selector" id="modeSelector">
+                <div class="mode-options">
+                    <div class="mode-option active" id="modeFast" onclick="selectMode('fast')">
+                        <span class="mode-icon">⚡</span>
+                        <div>
+                            <div class="mode-label">Fast Stitch</div>
+                            <div class="mode-desc">Dates as captions · instant</div>
+                        </div>
+                    </div>
+                    <div class="mode-option" id="modePolished" onclick="selectMode('polished')">
+                        <span class="mode-icon">🎬</span>
+                        <div>
+                            <div class="mode-label">Polished Stitch</div>
+                            <div class="mode-desc">Dates burned in · takes longer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button class="btn-go" id="btnGo">Start Stitching</button>
             <div class="loader" id="loader"></div>
             <div id="status" style="color:var(--primary-hover); font-weight:700; text-align:center; margin-top:1rem; display:none; text-transform:uppercase; letter-spacing:0.15em; font-size:0.82rem;">Crafting your movie... ✨</div>
+            <button class="btn-cancel-stitch" id="btnCancel" style="display:none" onclick="cancelStitch()">Cancel Stitching</button>
             <div class="error-msg" id="errorMsg"></div>
         </div>
     </div>
@@ -208,9 +297,32 @@
         </div>
     </div>
 
+    <!-- Google Drive Upload Modal -->
+    <div class="modal-overlay" id="driveModal">
+        <div class="modal" style="width:480px">
+            <h3>Upload to Google Drive</h3>
+            <div id="driveForm">
+                <div class="yt-field">
+                    <label>Title</label>
+                    <input type="text" id="driveTitle" placeholder="My Home Video">
+                </div>
+                <button class="btn-go" style="display:block; width:100%; margin:0" id="btnDriveUpload">UPLOAD</button>
+            </div>
+            <div id="driveStatus" style="display:none; margin-top:1rem"></div>
+            <div class="loader" id="driveLoader"></div>
+            <div class="error-msg" id="driveError"></div>
+            <button class="btn-cancel" id="driveCancel" onclick="closeModal('driveModal')">Cancel</button>
+        </div>
+    </div>
+
+
     <script>
     const $ = id => document.getElementById(id);
     let currentYear = '', currentVid = {};
+    let gatheredFiles = [];  // accumulated files across multiple selections
+    let selectedMode = 'fast';
+    let currentTaskId = null;
+    let stitchCancelled = false;
 
     /* ------------------------------------------------------------------
      * Helpers
@@ -252,8 +364,15 @@
     function resetUploadUI() {
         $('loader').style.display = 'none';
         $('status').style.display = 'none';
+        $('btnCancel').style.display = 'none';
+        $('btnCancel').disabled = false;
+        $('btnCancel').textContent = 'Cancel Stitching';
         $('btnGo').style.display = 'none';
         $('fileList').innerHTML = '';
+        $('modeSelector').style.display = 'none';
+        gatheredFiles = [];
+        currentTaskId = null;
+        stitchCancelled = false;
     }
 
     /** Safely escape a string for use in HTML attributes. */
@@ -274,10 +393,7 @@
         e.preventDefault();
         dropZone.classList.remove('drag-over');
         const dt = e.dataTransfer;
-        if (dt.files.length) {
-            $('fileInput').files = dt.files;
-            $('fileInput').dispatchEvent(new Event('change'));
-        }
+        if (dt.files.length) addFiles(Array.from(dt.files));
     });
 
     /* ------------------------------------------------------------------
@@ -288,12 +404,13 @@
             closeModal('titleModal');
             closeModal('thumbModal');
             closeModal('ytModal');
+            closeModal('driveModal');
             if ($('playerModal').style.display === 'flex') closePlayer();
         }
     });
 
     /* Click outside modal content to close */
-    ['titleModal', 'thumbModal', 'ytModal'].forEach(id => {
+    ['titleModal', 'thumbModal', 'ytModal', 'driveModal'].forEach(id => {
         $(id).addEventListener('click', e => {
             if (e.target === $(id)) closeModal(id);
         });
@@ -334,6 +451,7 @@
     function showYear(y, videos) {
         $('uploadView').style.display = 'none';
         if ($('yView')) $('yView').remove();
+        if ($('faqView')) $('faqView').remove();
 
         const view = document.createElement('div');
         view.id = 'yView';
@@ -373,7 +491,10 @@
             const ytBtn = document.createElement('button');
             ytBtn.textContent = 'Upload to YouTube';
             ytBtn.onclick = e => { e.stopPropagation(); openYtUpload(y, v.filename, v.title); };
-            dd.append(thumbBtn, ytBtn, delBtn);
+            const driveBtn = document.createElement("button");
+            driveBtn.textContent = "Upload to Google Drive";
+            driveBtn.onclick = e => { e.stopPropagation(); openDriveUpload(y, v.filename, v.title); };
+            dd.append(thumbBtn, ytBtn, driveBtn, delBtn);
 
             // Clickable content area
             const content = document.createElement('div');
@@ -399,7 +520,11 @@
             overlay.appendChild(titleDiv);
             content.appendChild(overlay);
 
-            card.append(menuBtn, dd, content);
+            const playIcon = document.createElement('div');
+            playIcon.className = 'play-icon';
+            playIcon.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><polygon points="8,5 20,12 8,19" fill="var(--primary-hover)"/></svg>';
+
+            card.append(menuBtn, dd, content, playIcon);
             grid.appendChild(card);
         });
 
@@ -433,6 +558,7 @@
             const data = await (await fetch('/library-data')).json();
             if (data[y]) showYear(y, data[y]); else showUpload();
             loadLib();
+
         } catch (err) {
             showError('Failed to delete video');
             console.error(err);
@@ -555,7 +681,7 @@
 
         try {
             const res = await fetch('/youtube/auth', { method: 'POST' });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Auth failed');
+            if (!res.ok) throw new Error(errorDetail((await res.json()).detail) || 'Auth failed');
             $('ytLoader').style.display = 'none';
             $('ytForm').style.display = 'block';
             $('ytStatus').style.display = 'none';
@@ -563,6 +689,20 @@
             $('ytLoader').style.display = 'none';
             $('ytError').textContent = err.message;
             $('ytError').style.display = 'block';
+        }
+    }
+
+    /** Poll a background upload task until it completes. */
+    async function pollUploadTask(taskId) {
+        while (true) {
+            await new Promise(r => setTimeout(r, 2000));
+            const res = await fetch('/upload/status/' + taskId);
+            if (!res.ok) throw new Error('Failed to check upload status');
+            const task = await res.json();
+            if (task.status === 'done')         return task;
+            if (task.status === 'error')        throw new Error(errorDetail(task.detail) || 'Upload failed');
+            if (task.status === 'auth_expired')  throw Object.assign(new Error(task.detail), {authExpired: true});
+            // still "uploading" — keep polling
         }
     }
 
@@ -585,9 +725,17 @@
                     privacy: $('ytPrivacy').value,
                 }),
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Upload failed');
+            if (res.status === 401) {
+                $('ytLoader').style.display = 'none';
+                btn.disabled = false;
+                btn.textContent = 'UPLOAD';
+                await ytAuth();
+                return;
+            }
+            if (!res.ok) throw new Error(errorDetail((await res.json()).detail) || 'Upload failed');
 
-            const data = await res.json();
+            const { task_id } = await res.json();
+            const data = await pollUploadTask(task_id);
             $('ytLoader').style.display = 'none';
             $('ytForm').style.display = 'none';
             $('ytStatus').style.display = 'block';
@@ -596,6 +744,7 @@
             $('ytCancel').textContent = 'Done';
         } catch (err) {
             $('ytLoader').style.display = 'none';
+            if (err.authExpired) { await ytAuth(); return; }
             $('ytError').textContent = err.message;
             $('ytError').style.display = 'block';
             btn.disabled = false;
@@ -604,34 +753,213 @@
     };
 
     /* ------------------------------------------------------------------
-     * Upload & stitch flow
+     * Google Drive upload
      * ----------------------------------------------------------------*/
-    $('fileInput').onchange = () => {
-        const files = Array.from($('fileInput').files);
-        $('fileList').innerHTML = '';
-        files.forEach(f => {
-            const row = document.createElement('div');
-            row.style.cssText = 'background:var(--surface); padding:0.8rem 1.2rem; margin-bottom:0.5rem; border-radius:1rem; border:1px solid var(--border); font-size:0.85rem; color:var(--text-dim); font-weight:600; box-shadow:0 2px 8px var(--shadow-soft)';
-            row.textContent = f.name;  // textContent = XSS safe
-            $('fileList').appendChild(row);
-        });
-        $('btnGo').style.display = files.length ? 'block' : 'none';
+    let driveCurrent = {};
+
+    async function openDriveUpload(year, filename, title) {
+        driveCurrent = { year, filename };
+        $('driveTitle').value = title || '';
+        $('driveForm').style.display = 'block';
+        $('driveStatus').style.display = 'none';
+        $('driveLoader').style.display = 'none';
+        $('driveError').style.display = 'none';
+        $('driveCancel').textContent = 'Cancel';
+        $('btnDriveUpload').disabled = false;
+        $('btnDriveUpload').textContent = 'UPLOAD';
+
+        try {
+            const res = await fetch('/drive/status');
+            const st = await res.json();
+            if (!st.configured) {
+                $('driveForm').style.display = 'none';
+                $('driveStatus').style.display = 'block';
+                $('driveStatus').innerHTML = '<p style="color:var(--text-dim)">Place a <strong>client_secrets.json</strong> from the <a href="https://console.cloud.google.com/apis/credentials" style="color:var(--primary)">Google Cloud Console</a> in the Gather app folder to enable Google Drive uploads.</p>';
+                $('driveModal').style.display = 'flex';
+                return;
+            }
+            if (!st.authenticated) {
+                await driveAuth();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+
+        $('driveModal').style.display = 'flex';
+    }
+
+    async function driveAuth() {
+        $('driveForm').style.display = 'none';
+        $('driveStatus').style.display = 'block';
+        $('driveStatus').innerHTML = '<p style="color:var(--text-dim)">Signing in with Google\u2026 check your browser.</p>';
+        $('driveLoader').style.display = 'block';
+        $('driveModal').style.display = 'flex';
+
+        try {
+            const res = await fetch('/drive/auth', { method: 'POST' });
+            if (!res.ok) throw new Error(errorDetail((await res.json()).detail) || 'Auth failed');
+            $('driveLoader').style.display = 'none';
+            $('driveForm').style.display = 'block';
+            $('driveStatus').style.display = 'none';
+        } catch (err) {
+            $('driveLoader').style.display = 'none';
+            $('driveError').textContent = err.message;
+            $('driveError').style.display = 'block';
+        }
+    }
+
+    $('btnDriveUpload').onclick = async () => {
+        const btn = $('btnDriveUpload');
+        btn.disabled = true;
+        btn.textContent = 'UPLOADING\u2026';
+        $('driveLoader').style.display = 'block';
+        $('driveError').style.display = 'none';
+
+        try {
+            const res = await fetch('/drive/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    year: driveCurrent.year,
+                    filename: driveCurrent.filename,
+                    title: $('driveTitle').value || 'My Video',
+                }),
+            });
+            if (res.status === 401) {
+                $('driveLoader').style.display = 'none';
+                btn.disabled = false;
+                btn.textContent = 'UPLOAD';
+                await driveAuth();
+                return;
+            }
+            if (!res.ok) throw new Error(errorDetail((await res.json()).detail) || 'Upload failed');
+
+            const { task_id } = await res.json();
+            const data = await pollUploadTask(task_id);
+            $('driveLoader').style.display = 'none';
+            $('driveForm').style.display = 'none';
+            $('driveStatus').style.display = 'block';
+            $('driveStatus').className = 'yt-success';
+            $('driveStatus').innerHTML = '\u2705 Uploaded! <a href="' + data.url + '" target="_blank">View on Google Drive</a>';
+            $('driveCancel').textContent = 'Done';
+        } catch (err) {
+            $('driveLoader').style.display = 'none';
+            if (err.authExpired) { await driveAuth(); return; }
+            $('driveError').textContent = err.message;
+            $('driveError').style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'UPLOAD';
+        }
     };
 
+    /* ------------------------------------------------------------------
+     * Upload & stitch flow
+     * ----------------------------------------------------------------*/
+    function addFiles(newFiles) {
+        const existing = new Set(gatheredFiles.map(f => f.name + f.size + f.lastModified));
+        newFiles.forEach(f => {
+            const key = f.name + f.size + f.lastModified;
+            if (!existing.has(key)) gatheredFiles.push(f);
+        });
+        renderFileList();
+    }
+
+    function removeFile(index) {
+        gatheredFiles.splice(index, 1);
+        renderFileList();
+    }
+
+
+    function selectMode(mode) {
+        selectedMode = mode;
+        document.querySelectorAll('.mode-option').forEach(el => el.classList.remove('active'));
+        $('mode' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+    }
+    function renderFileList() {
+        $('fileList').innerHTML = '';
+        gatheredFiles.forEach((f, i) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'background:var(--surface); padding:0.8rem 1.2rem; margin-bottom:0.5rem; border-radius:1rem; border:1px solid var(--border); font-size:0.85rem; color:var(--text-dim); font-weight:600; box-shadow:0 2px 8px var(--shadow-soft); display:flex; align-items:center; justify-content:space-between';
+
+            const name = document.createElement('span');
+            name.textContent = f.name;
+            name.style.cssText = 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:0.8rem';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '✕';
+            removeBtn.style.cssText = 'background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; padding:0 0.3rem; flex-shrink:0; transition:color 0.2s';
+            removeBtn.onmouseover = () => removeBtn.style.color = 'var(--danger)';
+            removeBtn.onmouseout = () => removeBtn.style.color = 'var(--text-muted)';
+            removeBtn.onclick = () => removeFile(i);
+
+            row.append(name, removeBtn);
+            $('fileList').appendChild(row);
+        });
+        $('btnGo').style.display = gatheredFiles.length ? 'block' : 'none';
+        $('modeSelector').style.display = gatheredFiles.length ? 'block' : 'none';
+    }
+
+    $('fileInput').onchange = () => {
+        addFiles(Array.from($('fileInput').files));
+        $('fileInput').value = '';  // reset so re-selecting the same files triggers change
+    };
+
+    /** Extract a human-readable message from a possibly complex error detail. */
+    function errorDetail(detail) {
+        if (!detail) return '';
+        if (typeof detail === 'string') return detail;
+        if (Array.isArray(detail)) return detail.map(d => d.msg || JSON.stringify(d)).join('; ');
+        return JSON.stringify(detail);
+    }
+
+    async function cancelStitch() {
+        if (!currentTaskId) return;
+        stitchCancelled = true;
+        $('btnCancel').disabled = true;
+        $('btnCancel').textContent = 'Cancelling...';
+        try {
+            await fetch('/upload/cancel/' + currentTaskId, { method: 'POST' });
+        } catch (err) {
+            console.error('Cancel request failed:', err);
+        }
+    }
+
+    async function pollTask(taskId) {
+        while (true) {
+            await new Promise(r => setTimeout(r, 2000));
+            const res = await fetch('/upload/status/' + taskId);
+            if (!res.ok) throw new Error('Status check failed');
+            const task = await res.json();
+            if (task.status === 'done') return task;
+            if (task.status === 'cancelled') return task;
+            if (task.status === 'error') throw new Error(errorDetail(task.detail) || 'Processing failed');
+        }
+    }
+
     $('btnGo').onclick = async () => {
+        const fd = new FormData();
+        gatheredFiles.forEach(f => fd.append('files', f));
+        fd.append('mode', selectedMode);
         resetUploadUI();
         $('loader').style.display = 'block';
         $('status').style.display = 'block';
+        $('btnCancel').style.display = 'block';
         try {
-            const fd = new FormData();
-            Array.from($('fileInput').files).forEach(f => fd.append('files', f));
             const res = await fetch('/upload', { method: 'POST', body: fd });
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
-                throw new Error(err.detail || 'Upload failed');
+                throw new Error(errorDetail(err.detail) || 'Upload failed');
             }
             const data = await res.json();
             currentYear = data.year;
+            currentTaskId = data.task_id;
+
+            const result = await pollTask(data.task_id);
+            if (result.status === 'cancelled' || stitchCancelled) {
+                resetUploadUI();
+                return;
+            }
+            currentYear = result.year;
             resetUploadUI();
             $('vTitle').value = '';
             $('titleModal').style.display = 'flex';
@@ -666,10 +994,42 @@
         }
     };
 
+
     /* ------------------------------------------------------------------
      * Init
      * ----------------------------------------------------------------*/
     loadLib();
+
+    /* --- Update checker --- */
+    function dismissUpdate() {
+        const banner = document.getElementById('updateBanner');
+        banner.style.display = 'none';
+        sessionStorage.setItem('update_dismissed', 'true');
+    }
+
+    async function checkForUpdate() {
+        if (sessionStorage.getItem('update_dismissed')) return;
+        try {
+            const resp = await fetch('/check-update');
+            const data = await resp.json();
+            if (data.update_available) {
+                document.getElementById('updateVersion').textContent = 'v' + data.latest_version;
+                document.getElementById('updateNotes').textContent = data.release_notes || '';
+                document.getElementById('updateLink').href = data.download_url;
+                document.getElementById('updateBanner').style.display = 'block';
+            }
+        } catch (e) { /* no internet? no problem */ }
+    }
+    checkForUpdate();
+
+    /* Override showUpload to clean up FAQ view */
+    const _baseShowUpload = showUpload;
+    showUpload = function() {
+        const fv = document.getElementById('faqView');
+        if (fv) fv.remove();
+        _baseShowUpload();
+    };
     </script>
+    <script src="/faq.js"></script>
 </body>
 </html>

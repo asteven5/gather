@@ -1,0 +1,5 @@
+{
+  "version": "1.1.0",
+  "download_url": "https://gathermovies.com/#download",
+  "release_notes": "Portrait video support, aspect-ratio preservation, hyphens in titles."
+}

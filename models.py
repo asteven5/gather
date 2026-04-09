@@ -42,7 +42,7 @@ class SaveToLibraryRequest(BaseModel):
     @property
     def safe_title(self) -> str:
         sanitized = "".join(
-            c for c in self.title if c.isalnum() or c in (" ", "_")
+            c for c in self.title if c.isalnum() or c in (" ", "_", "-")
         ).rstrip()
         return sanitized or "My Movie"
 
@@ -70,3 +70,9 @@ class YouTubeUploadRequest(BaseModel):
     title: str = "My Video"
     description: str = ""
     privacy: str = "private"
+
+
+class DriveUploadRequest(BaseModel):
+    year: Year
+    filename: SafeFilename
+    title: str = "My Video"

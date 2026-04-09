@@ -1,6 +1,11 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
+# Support both dev layout (files here) and distribution layout (_internal/)
+if [ -d "_internal" ]; then
+    cd _internal
+fi
+
 # Check for ffmpeg
 if ! command -v ffmpeg &> /dev/null
 then

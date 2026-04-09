@@ -12,9 +12,13 @@ __pycache__/
 .DS_Store
 
 # Secrets & credentials — NEVER commit these
+.env
 client_secrets.json
 youtube_tokens.json
 GIT Token.rtf
 
 # Logs
 *.log
+
+# Build artifacts
+website/Gather.zip

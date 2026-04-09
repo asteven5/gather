@@ -20,6 +20,7 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
+                <a href="/faq">FAQs</a>
                 <a href="#" class="nav-cta" onclick="openCheckout(); return false;">Get It — $9.99</a>
             </div>
             <button class="nav-toggle" aria-label="Menu">
@@ -54,17 +55,34 @@
                 </div>
                 <div class="window-body">
                     <div class="mock-sidebar">
-                        <div class="mock-heading"></div>
-                        <div class="mock-link active"></div>
-                        <div class="mock-link"></div>
-                        <div class="mock-link"></div>
+                        <div class="mock-sidebar-label">Library</div>
+                        <div class="mock-link mock-new-project">+ New Project</div>
+                        <div class="mock-link active">2025</div>
+                        <div class="mock-link">2023</div>
                     </div>
-                    <div class="mock-main">
-                        <div class="mock-title-text">Gather</div>
-                        <div class="mock-subtitle-text">Home Video Maker</div>
-                        <div class="mock-dropzone">
-                            <div class="mock-upload-icon">☁️</div>
-                            <div class="mock-upload-text">Drop clips here</div>
+                    <div class="mock-player-area">
+                        <div class="mock-player-header">
+                            <span class="mock-player-title">March 2025</span>
+                            <span class="mock-player-date">Mar 2025</span>
+                        </div>
+                        <div class="mock-video-wrapper">
+                            <video
+                                class="mock-hero-video"
+                                src="videos/downhill.mp4"
+                                poster="videos/preview_downhill.jpg"
+                                muted
+                                loop
+                                playsinline
+                                preload="metadata"
+                            ></video>
+                            <div class="mock-date-overlay">Mar 14, 2025</div>
+                        </div>
+                        <div class="mock-player-controls">
+                            <button class="mock-play-btn" aria-label="Play">▶</button>
+                            <div class="mock-progress-bar">
+                                <div class="mock-progress-fill"></div>
+                            </div>
+                            <span class="mock-timestamp">0:00 / 0:10</span>
                         </div>
                     </div>
                 </div>
@@ -169,28 +187,28 @@
                     <div class="memory-grid">
                         <div class="memory-card">
                             <div class="memory-thumb">
-                                <video src="videos/christmas.mp4" poster="videos/preview_christmas.jpg" muted loop playsinline preload="metadata"></video>
+                                <video src="videos/christmas_new.mp4" poster="videos/preview_christmas_new.jpg" muted loop playsinline preload="metadata"></video>
                                 <div class="memory-vignette"></div>
                             </div>
                             <div class="memory-label">Christmas 2025</div>
                         </div>
                         <div class="memory-card">
                             <div class="memory-thumb">
-                                <video src="videos/beach.mp4" poster="videos/preview_beach.jpg" muted loop playsinline preload="metadata"></video>
+                                <video src="videos/beachtrip.mp4" poster="videos/preview_beachtrip.jpg" muted loop playsinline preload="metadata"></video>
                                 <div class="memory-vignette"></div>
                             </div>
                             <div class="memory-label">Beach Trip</div>
                         </div>
                         <div class="memory-card">
                             <div class="memory-thumb">
-                                <video src="videos/t_852395.mp4" poster="videos/preview_t_852395.jpg" muted loop playsinline preload="metadata"></video>
+                                <video src="videos/firststeps.mp4" poster="videos/preview_firststeps.jpg" muted loop playsinline preload="metadata"></video>
                                 <div class="memory-vignette"></div>
                             </div>
                             <div class="memory-label">First Steps</div>
                         </div>
                         <div class="memory-card">
                             <div class="memory-thumb">
-                                <video src="videos/t_2795173.mp4" poster="videos/preview_t_2795173.jpg" muted loop playsinline preload="metadata"></video>
+                                <video src="videos/familyvideo.mp4" poster="videos/preview_familyvideo.jpg" muted loop playsinline preload="metadata"></video>
                                 <div class="memory-vignette"></div>
                             </div>
                             <div class="memory-label">Jan-Apr 2025</div>
@@ -229,6 +247,7 @@
                 <div class="footer-links">
                     <a href="#features">Features</a>
                     <a href="#how-it-works">How It Works</a>
+                    <a href="/faq">FAQs</a>
                     <a href="#download">Download</a>
                 </div>
                 <p class="footer-copy">&copy; 2025 Gather. Made with love for families everywhere.</p>
