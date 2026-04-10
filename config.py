@@ -96,9 +96,9 @@ FONT_SIZE = 48
 # ---------------------------------------------------------------------------
 # Stripe
 # ---------------------------------------------------------------------------
-STRIPE_SECRET_KEY = os.environ["STRIPE_SECRET_KEY"]
-STRIPE_PUBLISHABLE_KEY = os.environ["STRIPE_PUBLISHABLE_KEY"]
-STRIPE_PRICE_ID = os.environ["STRIPE_PRICE_ID"]
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")
 
 # ---------------------------------------------------------------------------
 # Server
