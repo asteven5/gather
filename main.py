@@ -1,5 +1,7 @@
 """Gather — Home Video Maker.  Application entry point."""
 
+import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -8,7 +10,7 @@ import urllib.request
 import uvicorn
 from fastapi import FastAPI
 
-from config import HOST, PORT
+from config import HOST, PORT, check_dependencies
 from routes import router
 from stripe_routes import router as stripe_router
 
@@ -45,6 +47,30 @@ def _set_macos_app_name(name: str):
         pass  # not on macOS
 
 
+def _show_missing_deps_dialog(missing: list[str]) -> None:
+    """Show a native macOS dialog listing missing dependencies."""
+    names = ", ".join(missing)
+    msg = (
+        f"Gather requires the following tools to be installed: {names}\\n\\n"
+        "To install them, open Terminal and run:\\n\\n"
+        "    brew install ffmpeg\\n\\n"
+        "If you don't have Homebrew, install it first:\\n\\n"
+        "    /bin/bash -c \\\"$(curl -fsSL "
+        "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\\\""
+    )
+    if sys.platform == "darwin":
+        subprocess.run(
+            [
+                "osascript", "-e",
+                'display dialog "' + msg + '" buttons {"OK"} '
+                'default button "OK" with title "Gather — Missing Dependencies" '
+                'with icon stop',
+            ],
+            check=False,
+        )
+    else:
+        print(f"ERROR: Missing dependencies: {names}", file=sys.stderr)
+
 
 class _GatherApi:
     """Thin bridge so frontend JS can call native window methods."""
@@ -58,6 +84,12 @@ if __name__ == "__main__":
     import webview
 
     _set_macos_app_name("Gather")
+
+    # Gate on required binaries before starting anything.
+    missing = check_dependencies()
+    if missing:
+        _show_missing_deps_dialog(missing)
+        sys.exit(1)
 
     server_thread = threading.Thread(target=_start_server, daemon=True)
     server_thread.start()

@@ -1,9 +1,10 @@
 """Application configuration and directory setup."""
 
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 
 import logging
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -53,7 +54,7 @@ TIMEZONE = "US/Central"
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
 VIDEO_BITRATE = "12000k"
-VIDEO_FRAME_RATE = "30000/1001"  # 29.97 fps (NTSC) — forces uniform fps across clips
+VIDEO_FRAME_RATE = "30000/1001"  # 29.97 fps (NTSC)
 AUDIO_SAMPLE_RATE = "44100"
 AUDIO_CHANNELS = "2"
 
@@ -105,6 +106,36 @@ STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")
 # ---------------------------------------------------------------------------
 HOST = "127.0.0.1"
 PORT = 8000
+
+# ---------------------------------------------------------------------------
+# Binary resolution — bundled copies take priority over system PATH
+# ---------------------------------------------------------------------------
+def _find_binary(name: str) -> str:
+    """Locate *name*, preferring the bundled ``bin/`` dir inside the app."""
+    bundled = BASE_DIR / "bin" / name
+    if bundled.is_file() and os.access(bundled, os.X_OK):
+        logger.info("Using bundled %s: %s", name, bundled)
+        return str(bundled)
+    found = shutil.which(name)
+    if found:
+        logger.info("Using system %s: %s", name, found)
+        return found
+    return ""  # empty -> caught by the startup check
+
+
+FFMPEG = _find_binary("ffmpeg")
+FFPROBE = _find_binary("ffprobe")
+
+
+def check_dependencies() -> list[str]:
+    """Return a list of missing required binaries."""
+    missing: list[str] = []
+    if not FFMPEG:
+        missing.append("ffmpeg")
+    if not FFPROBE:
+        missing.append("ffprobe")
+    return missing
+
 
 # ---------------------------------------------------------------------------
 # Performance tuning

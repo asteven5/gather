@@ -8,6 +8,7 @@
 #   └── Contents/
 #       └── Resources/
 #           └── app/          ← Python + HTML + JS tucked in here
+#               └── bin/      ← static ffmpeg + ffprobe
 #
 # Usage:  ./build_release.sh
 
@@ -57,7 +58,30 @@ done
 
 echo "   Bundled ${#RUNTIME_FILES[@]} runtime files into Gather.app"
 
-# ── 3. Compile fresh AppleScript with bundled-path support ────────────────
+# ── 3. Bundle static ffmpeg/ffprobe binaries ──────────────────────────────
+BIN_DIR="$APP_DIR/bin"
+mkdir -p "$BIN_DIR"
+
+FFMPEG_URL="https://evermeet.cx/ffmpeg/getrelease/zip"
+FFPROBE_URL="https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
+DL_TMP="$(mktemp -d)"
+
+echo "   Downloading ffmpeg…"
+curl -sL "$FFMPEG_URL" -o "$DL_TMP/ffmpeg.zip"
+unzip -qo "$DL_TMP/ffmpeg.zip" -d "$DL_TMP/ffmpeg"
+cp "$DL_TMP/ffmpeg/ffmpeg" "$BIN_DIR/ffmpeg"
+chmod +x "$BIN_DIR/ffmpeg"
+
+echo "   Downloading ffprobe…"
+curl -sL "$FFPROBE_URL" -o "$DL_TMP/ffprobe.zip"
+unzip -qo "$DL_TMP/ffprobe.zip" -d "$DL_TMP/ffprobe"
+cp "$DL_TMP/ffprobe/ffprobe" "$BIN_DIR/ffprobe"
+chmod +x "$BIN_DIR/ffprobe"
+
+rm -rf "$DL_TMP"
+echo "   Bundled ffmpeg + ffprobe into app/bin/"
+
+# ── 4. Compile fresh AppleScript with bundled-path support ────────────────
 if [ -f "$PROJ/Gather.applescript" ]; then
     echo "   Compiling AppleScript…"
     osacompile -o "$BUILD/Gather.app/Contents/Resources/Scripts/main.scpt" \
@@ -66,17 +90,17 @@ else
     echo "⚠️  Gather.applescript not found — using existing main.scpt"
 fi
 
-# ── 4. Re-sign the app (old signature is invalid after modifying bundle) ──
+# ── 5. Re-sign the app (old signature is invalid after modifying bundle) ──
 echo "   Re-signing app bundle…"
 codesign --remove-signature "$BUILD/Gather.app" 2>/dev/null || true
 codesign --force --deep -s - "$BUILD/Gather.app"
 
-# ── 5. Zip it up — just Gather.app, nothing else ─────────────────────────
+# ── 6. Zip it up — just Gather.app, nothing else ─────────────────────────
 echo "   Creating zip…"
 rm -f "$ZIP_OUT"
 (cd "$BUILD" && zip -r -q "$ZIP_OUT" Gather.app/ -x "*.DS_Store")
 
-# ── 6. Summary ────────────────────────────────────────────────────────────
+# ── 7. Summary ────────────────────────────────────────────────────────────
 FILE_COUNT=$(unzip -l "$ZIP_OUT" | tail -1 | awk '{print $2}')
 ZIP_SIZE=$(du -h "$ZIP_OUT" | cut -f1)
 
@@ -88,7 +112,7 @@ echo ""
 echo "   Customer sees:"
 echo "   📁 → unzip → 🎬 Gather.app (just double-click!)"
 
-# ── 7. Clean up ───────────────────────────────────────────────────────────
+# ── 8. Clean up ───────────────────────────────────────────────────────────
 rm -rf "$BUILD"
 
 echo ""

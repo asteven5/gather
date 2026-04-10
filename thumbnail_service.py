@@ -3,7 +3,7 @@
 import shutil
 from pathlib import Path
 
-from config import OUTPUT_DIR, THUMB_SIZE, logger
+from config import FFMPEG, OUTPUT_DIR, THUMB_SIZE, logger
 from video_service import _get_duration_secs, _secs_to_timestamp
 
 # Re-export so routes.py can import from one place.
@@ -23,7 +23,7 @@ def generate_thumbnail(
     size = THUMB_SIZE
     subprocess.run(
         [
-            "ffmpeg", "-y",
+            FFMPEG, "-y",
             "-i", str(video_path),
             "-ss", timestamp,
             "-vframes", "1",

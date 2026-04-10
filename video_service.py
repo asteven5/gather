@@ -15,7 +15,8 @@ import pytz
 from PIL import Image, ImageDraw, ImageFont
 
 from config import (
-    AUDIO_CHANNELS,
+    FFMPEG,
+    FFPROBE,    AUDIO_CHANNELS,
     AUDIO_SAMPLE_RATE,
     DATE_DISPLAY_SECS,
     FFMPEG_THREADS,
@@ -129,7 +130,7 @@ _HW_STRATEGIES = _hw_video_strategies()
 def _detect_working_encoder() -> list[str]:
     """Try each encoder strategy with a tiny test. Return the first winner."""
     test_base = [
-        "ffmpeg", "-y", "-f", "lavfi", "-i", "nullsrc=s=64x64:d=0.1",
+        FFMPEG, "-y", "-f", "lavfi", "-i", "nullsrc=s=64x64:d=0.1",
         "-frames:v", "1",
     ]
     for strategy in [*_HW_STRATEGIES, _SW_VIDEO_ARGS]:
@@ -177,7 +178,7 @@ def probe_video(file_path: Path) -> VideoMeta:
     tz = pytz.timezone(TIMEZONE)
     result = subprocess.run(
         [
-            "ffprobe", "-v", "quiet", "-print_format", "json",
+            FFPROBE, "-v", "quiet", "-print_format", "json",
             "-show_format", "-show_streams",
             str(file_path),
         ],
@@ -429,7 +430,7 @@ def _concat_segments(
             fh.write(f"file '{safe}'\n")
 
     fast_cmd = [
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+        FFMPEG, "-y", "-f", "concat", "-safe", "0",
         "-i", str(concat_list), "-c", "copy",
         *_FASTSTART, str(output_path),
     ]
@@ -438,7 +439,7 @@ def _concat_segments(
     if result.returncode != 0:
         logger.warning("Stream-copy concat failed, falling back to re-encode")
         slow_cmd = [
-            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+            FFMPEG, "-y", "-f", "concat", "-safe", "0",
             "-i", str(concat_list),
             *_WORKING_ENCODER, *_AUDIO_ARGS,
             str(output_path),
@@ -498,7 +499,7 @@ def _normalize_clip(
 
     if meta.has_audio:
         cmd = [
-            "ffmpeg", "-y", "-i", str(src),
+            FFMPEG, "-y", "-i", str(src),
             "-vf", vf,
             *fps_args,
             *_WORKING_ENCODER, *_AUDIO_ARGS,
@@ -506,7 +507,7 @@ def _normalize_clip(
         ]
     else:
         cmd = [
-            "ffmpeg", "-y",
+            FFMPEG, "-y",
             "-i", str(src),
             "-f", "lavfi", "-i",
             f"anullsrc=r={AUDIO_SAMPLE_RATE}:cl=stereo",
@@ -564,7 +565,7 @@ def process_videos_fast(
     cancel_check()
     # Mux subtitle track (stream-copy everything)
     mux_cmd = [
-        "ffmpeg", "-y",
+        FFMPEG, "-y",
         "-i", str(concat_only),
         "-i", str(sub_path),
         "-c", "copy", "-c:s", "mov_text",
@@ -589,7 +590,7 @@ def _find_split_keyframe(file_path: Path, target_secs: float) -> float:
     """Find the PTS of the first keyframe at or after *target_secs*."""
     result = subprocess.run(
         [
-            "ffprobe", "-v", "quiet",
+            FFPROBE, "-v", "quiet",
             "-select_streams", "v:0",
             "-show_entries", "packet=pts_time,flags",
             "-of", "csv=p=0",
@@ -625,7 +626,7 @@ def _process_full_video(
 
     fps_args = ["-r", VIDEO_FRAME_RATE, "-video_track_timescale", "30000"]
     cmd = [
-        "ffmpeg", "-y",
+        FFMPEG, "-y",
         "-i", str(input_path),
         "-i", str(overlay_path),
         "-filter_complex", _build_filter_complex(meta.has_audio, target_w, target_h),
@@ -675,7 +676,7 @@ def _process_partial_video(
 
     # --- Head: re-encode with date overlay ---
     head_cmd = [
-        "ffmpeg", "-y",
+        FFMPEG, "-y",
         "-i", str(input_path),
         "-i", str(overlay_path),
         "-t", str(split_time),
@@ -693,7 +694,7 @@ def _process_partial_video(
     # --- Tail: stream-copy when source matches target, normalize otherwise ---
     if _matches_target_format(meta, target_w, target_h):
         tail_cmd = [
-            "ffmpeg", "-y",
+            FFMPEG, "-y",
             "-ss", str(split_time),
             "-i", str(input_path),
             "-c", "copy",
@@ -704,7 +705,7 @@ def _process_partial_video(
         norm_vf = f"{_fit_scale(target_w, target_h)},format=yuv420p"
         if meta.has_audio:
             tail_cmd = [
-                "ffmpeg", "-y",
+                FFMPEG, "-y",
                 "-ss", str(split_time),
                 "-i", str(input_path),
                 "-vf", norm_vf,
@@ -714,7 +715,7 @@ def _process_partial_video(
             ]
         else:
             tail_cmd = [
-                "ffmpeg", "-y",
+                FFMPEG, "-y",
                 "-ss", str(split_time),
                 "-i", str(input_path),
                 "-filter_complex",
@@ -774,7 +775,7 @@ def _get_duration_secs(video_path: Path) -> float:
     """Return the duration of a video in seconds."""
     result = subprocess.run(
         [
-            "ffprobe", "-v", "quiet",
+            FFPROBE, "-v", "quiet",
             "-show_entries", "format=duration",
             "-of", "default=noprint_wrappers=1:nokey=1",
             str(video_path),

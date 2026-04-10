@@ -15,11 +15,11 @@ property launchTime : missing value
 
 on run
 	set launchTime to current date
-
+	
 	set appPath to POSIX path of (path to me)
 	set parentDir to do shell script "cd " & quoted form of appPath & "/.. && pwd"
 	set bundledDir to appPath & "Contents/Resources/app"
-
+	
 	-- Pick the first layout that has main.py
 	set workDir to ""
 	repeat with candidate in {bundledDir, parentDir & "/_internal", parentDir}
@@ -29,22 +29,37 @@ on run
 			exit repeat
 		end try
 	end repeat
-
+	
 	if workDir is "" then
 		display dialog "Could not find main.py — is the app damaged?" buttons {"OK"} default button "OK" with icon stop
 		quit
 		return
 	end if
-
+	
 	set mainPy to workDir & "/main.py"
 	set reqFile to workDir & "/requirements.txt"
 	set logFile to "/tmp/gather.log"
 	set envSetup to "export PATH=$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-
+	
+	-- Check for uv
+	try
+		do shell script envSetup & " && command -v uv > /dev/null 2>&1"
+	on error
+		display dialog "Gather requires 'uv' (a Python package manager) but it isn't installed." & return & return & "To install it, open Terminal and run:" & return & return & "    curl -LsSf https://astral.sh/uv/install.sh | sh" & return & return & "Then relaunch Gather." buttons {"Open Terminal", "OK"} default button "OK" with title "Gather — Missing Dependency" with icon stop
+		if button returned of result is "Open Terminal" then
+			tell application "Terminal"
+				activate
+				do script "curl -LsSf https://astral.sh/uv/install.sh | sh"
+			end tell
+		end if
+		quit
+		return
+	end try
+	
 	-- Warmup: establish PATH and let uv initialize its cache
 	do shell script envSetup & " && echo \"launch $(date)\" > " & quoted form of logFile
 	do shell script envSetup & " && uv --version >> " & quoted form of logFile & " 2>&1"
-
+	
 	-- Launch in background — applet stays open via OSAAppletStayOpen
 	do shell script envSetup & " && cd " & quoted form of workDir & " && uv run --with-requirements " & quoted form of reqFile & " " & quoted form of mainPy & " >> " & quoted form of logFile & " 2>&1 &"
 end run
@@ -61,7 +76,7 @@ on idle
 	if (current date) - launchTime < 20 then
 		return 3
 	end if
-
+	
 	-- Quit the applet when the server is no longer running
 	try
 		do shell script "lsof -ti :8000"
