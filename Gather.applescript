@@ -37,6 +37,7 @@ on run
 	end if
 
 	set mainPy to workDir & "/main.py"
+	set reqFile to workDir & "/requirements.txt"
 	set logFile to "/tmp/gather.log"
 	set envSetup to "export PATH=$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
@@ -45,7 +46,7 @@ on run
 	do shell script envSetup & " && uv --version >> " & quoted form of logFile & " 2>&1"
 
 	-- Launch in background — applet stays open via OSAAppletStayOpen
-	do shell script envSetup & " && cd " & quoted form of workDir & " && uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview " & quoted form of mainPy & " >> " & quoted form of logFile & " 2>&1 &"
+	do shell script envSetup & " && cd " & quoted form of workDir & " && uv run --with-requirements " & quoted form of reqFile & " " & quoted form of mainPy & " >> " & quoted form of logFile & " 2>&1 &"
 end run
 
 on reopen

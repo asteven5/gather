@@ -28,5 +28,5 @@ if ! command -v uv &> /dev/null; then
 fi
 
 echo "Starting Gather..."
-uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview main.py
+uv run --with-requirements requirements.txt main.py
 echo "Gather has closed."

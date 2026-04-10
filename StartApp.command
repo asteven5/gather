@@ -26,5 +26,5 @@ fi
 
 # Run the app using uv to handle dependencies automatically
 echo "Starting Gather..."
-uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview main.py
+uv run --with-requirements requirements.txt main.py
 echo "Gather has closed."

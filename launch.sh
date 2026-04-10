@@ -11,4 +11,4 @@ if [ -d "_internal" ]; then
     cd _internal
 fi
 
-exec uv run --with fastapi --with uvicorn --with python-multipart --with jinja2 --with Pillow --with pytz --with pywebview main.py
+exec uv run --with-requirements requirements.txt main.py
